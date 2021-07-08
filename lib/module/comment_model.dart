@@ -92,7 +92,9 @@ class CommentElement {
         replies: List<dynamic>.from(json["replies"].map((x) => x)),
         id: json["_id"],
         user: json["user"],
-        alumni: Alumni.fromJson(json["alumni"]),
+        alumni: json["alumni"] == null
+            ? Alumni.fromJson(json["user"])
+            : Alumni.fromJson(json["alumni"]),
         comment: json["comment"],
         post: json["post"],
       );

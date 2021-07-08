@@ -18,8 +18,6 @@ class _SliderPageState extends State<SliderPage> {
     FourthSkipPage()
   ];
 
-  int indexx = 0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,26 +46,13 @@ class _SliderPageState extends State<SliderPage> {
                 children: [
                   Expanded(child: TabBarView(children: _list)),
                   const TabPageSelector(),
-                  indexx < 3
-                      ? ElevatedButton(
-                          onPressed: () {
-                            final TabController? controller =
-                                DefaultTabController.of(context);
-                            if (!controller!.indexIsChanging) {
-                              controller.animateTo(indexx + 1);
-                            }
-                            setState(() {
-                              indexx++;
-                            });
-                          },
-                          child: const Text('Next'))
-                      : ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pushReplacement(
-                                new MaterialPageRoute(
-                                    builder: (context) => Authe()));
-                          },
-                          child: const Text('Next')),
+                  // ElevatedButton(
+                  //     onPressed: () {
+                  //       Navigator.of(context).pushReplacement(
+                  //           new MaterialPageRoute(
+                  //               builder: (context) => Authe()));
+                  //     },
+                  //     child: const Text('Next')),
                 ],
               ),
             ),

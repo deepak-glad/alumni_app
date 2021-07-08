@@ -1,5 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:test_appp/api/comment_api.dart';
 import 'package:test_appp/module/comment_model.dart';
 
@@ -33,7 +35,7 @@ class _CommentScreenState extends State<CommentScreen> {
   late Future<Comment> _future;
   void initState() {
     setState(() {
-      _future = CommentGetData(widget.postId);
+      _future = commentgetdata(widget.postId);
     });
     super.initState();
   }
@@ -42,7 +44,8 @@ class _CommentScreenState extends State<CommentScreen> {
   var _current = 0;
   @override
   Widget build(BuildContext context) {
-    print(widget.isLiked);
+    // commentgetdata(widget.postId);
+    // print(widget.postId);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).canvasColor,
@@ -230,13 +233,95 @@ class _CommentScreenState extends State<CommentScreen> {
                 FutureBuilder<Comment>(
                     future: _future,
                     builder: (context, snapshot) {
-                      return Container(
-                        child: ListTile(
-                          leading: CircleAvatar(),
-                          title: Text('NAme'),
-                          subtitle: Text('Fresher'),
-                          trailing: Text('time'),
-                        ),
+                      print(snapshot.data);
+                      if (snapshot.hasData) {
+                        return ListView.builder(
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: snapshot.data!.data.comments.length,
+                            itemBuilder: (context, index) {
+                              var dta = snapshot.data!.data;
+                              return Container(
+                                width: MediaQuery.of(context).size.width,
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                          width: 80, child: CircleAvatar()),
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width -
+                                                100,
+                                        margin: const EdgeInsets.only(
+                                            right: 8, top: 10, bottom: 10),
+                                        padding: const EdgeInsets.all(8.0),
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            color: Colors.grey[200],
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black54,
+                                                blurRadius: .5,
+                                              ),
+                                            ]),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          vertical: 5.0),
+                                                      child: Text(
+                                                        "${dta.comments[index].alumni.firstName} ${dta.comments[index].alumni.lastName}",
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 16),
+                                                      ),
+                                                    ),
+                                                    Text(snapshot
+                                                        .data!
+                                                        .data
+                                                        .comments[index]
+                                                        .alumni
+                                                        .college),
+                                                    // Text(snapshot.data!.data.likesUser[0])
+                                                  ],
+                                                ),
+                                                IconButton(
+                                                    onPressed: () {},
+                                                    icon: Icon(Icons.more_vert))
+                                              ],
+                                            ),
+                                            // Icon(Icons.more_vert),
+                                            SizedBox(height: 15),
+
+                                            Text(
+                                              dta.comments[index].comment,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: 16),
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                    ]),
+                              );
+                            });
+                      }
+                      return Center(
+                        child: CircularProgressIndicator(),
                       );
                     }),
               ]),

@@ -9,27 +9,31 @@ import 'package:test_appp/module/comment_model.dart';
 Future<void> commentData(String postId, String message) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var value = prefs.getString('token');
-  var body = {"comment": message};
+  var data = {"comment": message};
   var url = Uri.parse(
       'https://alumni-supervision.herokuapp.com/post/comments/$postId');
   http.Response reponse =
-      await http.patch(url, body: jsonEncode(body), headers: {
+      await http.patch(url, body: jsonEncode(data), headers: {
     HttpHeaders.authorizationHeader: value.toString(),
+    "Accept": "application/json",
+    'Content-Type': 'application/json; charset=UTF-8',
   });
   final jsonBody = reponse.body;
   final jsonMap = jsonDecode(jsonBody);
   print('$jsonMap posting data');
 }
 
-Future<Comment> CommentGetData(String postId) async {
+Future<Comment> commentgetdata(String id) async {
   var data;
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var value = prefs.getString('token');
 
   var url = Uri.parse(
-      'https://alumni-supervision.herokuapp.com/post/likes-Comment/$postId');
-  http.Response reponse = await http.patch(url, headers: {
+      'https://alumni-supervision.herokuapp.com/post/likes-Comment/$id');
+  http.Response reponse = await http.get(url, headers: {
     HttpHeaders.authorizationHeader: value.toString(),
+    "Accept": "application/json",
+    'Content-Type': 'application/json; charset=UTF-8',
   });
   final jsonBody = reponse.body;
   final jsonMap = jsonDecode(jsonBody);
