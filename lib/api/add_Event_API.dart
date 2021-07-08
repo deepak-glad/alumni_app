@@ -40,7 +40,6 @@ class _AddEventState extends State<AddEvent> {
     var jsonResponse = json.decode(response.body);
     print(response.body);
     if (response.statusCode == 200 && jsonResponse['status']) {
-      print('yes');
       Navigator.of(context).pop();
       var message = 'successfully addded event please refresh it to see';
       ScaffoldMessenger.of(cc).showSnackBar(

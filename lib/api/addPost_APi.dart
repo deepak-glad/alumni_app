@@ -16,8 +16,8 @@ class SharePost extends StatefulWidget {
 class _SharePostState extends State<SharePost> {
   var isLaoding = false;
 
-  Future<void> _onsubmit(
-      String title, String des, BuildContext cc, List photoArray) async {
+  Future<void> _onsubmit(String title, String des, BuildContext cc,
+      List photoArray, List videoData) async {
     var defaultmessage = 'added successfully';
     setState(() {
       isLaoding = true;

@@ -50,18 +50,6 @@ class _EventsScreenState extends State<EventsScreen> {
     super.initState();
   }
 
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
-    eventApi();
-    super.didChangeDependencies();
-  }
-
   Future<void> eventDate() async {
     _events = {};
     var url = Uri.parse('https://alumni-supervision.herokuapp.com/event/get');
@@ -87,6 +75,15 @@ class _EventsScreenState extends State<EventsScreen> {
     setState(() {});
   }
 
+  Future _onPull() async {
+    await Future.delayed(Duration(milliseconds: 1000));
+    array = [];
+
+    setState(() {
+      _future = eventApi();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,132 +101,137 @@ class _EventsScreenState extends State<EventsScreen> {
               icon: Icon(Icons.notifications_none_outlined))
         ],
       ),
-      body: SingleChildScrollView(
-        child: Container(
-            child: Column(
-          children: [
-            ListTile(
-              title: Text('Hello,$name',
-                  style: TextStyle(fontSize: 19, fontWeight: FontWeight.w400)),
-              subtitle: Text("Lets explore what's happening in college",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400)),
-              trailing: CircleAvatar(),
-            ),
-            TableCalendar(
-              locale: 'en_US',
-              calendarBuilders: CalendarBuilders(
-                dowBuilder: (context, day) {
-                  if (day.weekday == DateTime.sunday ||
-                      day.weekday == DateTime.saturday) {
-                    final text = DateFormat.E().format(day);
+      body: RefreshIndicator(
+        onRefresh: _onPull,
+        child: ListView(shrinkWrap: true, children: [
+          Container(
+              child: Column(
+            children: [
+              ListTile(
+                title: Text('Hello,$name',
+                    style:
+                        TextStyle(fontSize: 19, fontWeight: FontWeight.w400)),
+                subtitle: Text("Lets explore what's happening in college",
+                    style:
+                        TextStyle(fontSize: 15, fontWeight: FontWeight.w400)),
+                trailing: CircleAvatar(),
+              ),
+              TableCalendar(
+                locale: 'en_US',
+                calendarBuilders: CalendarBuilders(
+                  dowBuilder: (context, day) {
+                    if (day.weekday == DateTime.sunday ||
+                        day.weekday == DateTime.saturday) {
+                      final text = DateFormat.E().format(day);
 
-                    return Center(
-                      child: Text(
-                        text,
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    );
+                      return Center(
+                        child: Text(
+                          text,
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      );
+                    }
+                  },
+                ),
+                daysOfWeekVisible: true,
+                selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                onDaySelected: (selectedDay, focusedDay) {
+                  if (!isSameDay(_selectedDay, selectedDay)) {
+                    setState(() {
+                      _selectedDay = selectedDay;
+                      _focusedDay = focusedDay;
+                      array = [];
+
+                      // _rangeStart = null; // Important to clean those
+                      // _rangeEnd = null;
+                      // _rangeSelectionMode = RangeSelectionMode.toggledOff;
+                    });
+
+                    // _selectedEvents.value = _getEventsForDay(selectedDay);
                   }
                 },
-              ),
-              daysOfWeekVisible: true,
-              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-              onDaySelected: (selectedDay, focusedDay) {
-                if (!isSameDay(_selectedDay, selectedDay)) {
+                calendarFormat: _calendarFormat,
+                onFormatChanged: (format) {
                   setState(() {
-                    _selectedDay = selectedDay;
-                    _focusedDay = focusedDay;
+                    _calendarFormat = format;
                     array = [];
-
-                    // _rangeStart = null; // Important to clean those
-                    // _rangeEnd = null;
-                    // _rangeSelectionMode = RangeSelectionMode.toggledOff;
                   });
-
-                  // _selectedEvents.value = _getEventsForDay(selectedDay);
-                }
-              },
-              calendarFormat: _calendarFormat,
-              onFormatChanged: (format) {
-                setState(() {
-                  _calendarFormat = format;
-                  array = [];
-                });
-              },
-              eventLoader: _getEventsForDay,
-              onPageChanged: (focusedDay) {
-                _focusedDay = focusedDay;
-                // array = [];
-              },
-              pageJumpingEnabled: true,
-              firstDay: DateTime(2000),
-              lastDay: DateTime(2090),
-              focusedDay: _focusedDay,
-            ),
-            //  ..._list
-            //                 .map((event) => Text(event[_focusedDay].toString()))
-            //                 .toList(),
-            Divider(color: Colors.black54),
-            Container(
-              alignment: Alignment.topLeft,
-              padding: const EdgeInsets.all(10.0),
-              child: Text(
-                'Things to do',
-                style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold),
+                },
+                eventLoader: _getEventsForDay,
+                onPageChanged: (focusedDay) {
+                  _focusedDay = focusedDay;
+                  // array = [];
+                },
+                pageJumpingEnabled: true,
+                firstDay: DateTime(2000),
+                lastDay: DateTime(2090),
+                focusedDay: _focusedDay,
               ),
-            ),
-            FutureBuilder<Welcome>(
-                future: _future,
-                builder: (context, snashot) {
-                  if (snashot.hasData) {
-                    for (var e in snashot.data!.data) {
-                      if (e.date == _focusedDay) {
-                        array.add(e);
+              //  ..._list
+              //                 .map((event) => Text(event[_focusedDay].toString()))
+              //                 .toList(),
+              Divider(color: Colors.black54),
+              Container(
+                alignment: Alignment.topLeft,
+                padding: const EdgeInsets.all(10.0),
+                child: Text(
+                  'Things to do',
+                  style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+              FutureBuilder<Welcome>(
+                  future: _future,
+                  builder: (context, snashot) {
+                    if (snashot.hasData) {
+                      for (var e in snashot.data!.data) {
+                        if (e.date == _focusedDay) {
+                          array.add(e);
+                        }
                       }
+                      if (array.isNotEmpty) {
+                        return ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: array.length,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                leading: CircleAvatar(),
+                                title: Text(array[index].title),
+                                subtitle: Text(array[index].description),
+                                trailing: Text(array[index].venue),
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute<void>(
+                                      builder: (BuildContext context) =>
+                                          EventDetail(
+                                              array[index].title,
+                                              array[index].description,
+                                              array[index].mediaUrl,
+                                              array[index].venue,
+                                              array[index].date,
+                                              array[index].id),
+                                    ),
+                                  );
+                                },
+                              );
+                            });
+                      } else
+                        return Container(
+                            margin: const EdgeInsets.all(10),
+                            child: Text(
+                              'No Event Found',
+                              style: TextStyle(
+                                  fontSize: 19, fontWeight: FontWeight.bold),
+                            ));
                     }
-                    if (array.isNotEmpty) {
-                      return ListView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: array.length,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              leading: CircleAvatar(),
-                              title: Text(array[index].title),
-                              subtitle: Text(array[index].description),
-                              trailing: Text(array[index].venue),
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute<void>(
-                                    builder: (BuildContext context) =>
-                                        EventDetail(
-                                            array[index].title,
-                                            array[index].description,
-                                            array[index].mediaUrl,
-                                            array[index].venue,
-                                            array[index].date,
-                                            array[index].id),
-                                  ),
-                                );
-                              },
-                            );
-                          });
-                    } else
-                      return Container(
-                          margin: const EdgeInsets.all(10),
-                          child: Text(
-                            'No Event Found',
-                            style: TextStyle(
-                                fontSize: 19, fontWeight: FontWeight.bold),
-                          ));
-                  }
-                  return Center(child: CircularProgressIndicator());
-                }),
-          ],
-        )),
+                    return Center(child: CircularProgressIndicator());
+                  }),
+            ],
+          )),
+        ]),
       ),
 
       floatingActionButton: Ink(

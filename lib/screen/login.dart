@@ -22,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   var _password = '';
   bool rememberme = false;
   bool _showPassword = false;
-  var cho = '';
+  var cho;
   late String _select;
   void _selectalumniniORstudent(String select) {
     _select = select;
@@ -59,14 +59,13 @@ class _LoginPageState extends State<LoginPage> {
               setState(() {
                 cho = 'student';
               });
-
+              // cho = 'student';
               Navigator.of(context).pop();
             })
       ],
     ).show();
-    if (isValid && cho != null) {
+    if (isValid && cho != null && cho != 'null') {
       _formKey.currentState!.save();
-
       widget.submitFn(
         _username.trim(),
         _password.trim(),
@@ -74,9 +73,11 @@ class _LoginPageState extends State<LoginPage> {
         cho,
         context,
       );
+      cho = 'null';
     } else {
       var d = 'please choice one category';
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        behavior: SnackBarBehavior.floating,
         duration: Duration(seconds: 5),
         content: Text(d),
         backgroundColor: Theme.of(context).errorColor,

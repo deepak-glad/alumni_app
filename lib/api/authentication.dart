@@ -69,6 +69,7 @@ class _AutheState extends State<Authe> {
   bool isLoading = false;
   Future signInMethod(String email, String pass, bool rem, String choice,
       BuildContext cc) async {
+    print(choice);
     setState(() {
       isLoading = true;
     });

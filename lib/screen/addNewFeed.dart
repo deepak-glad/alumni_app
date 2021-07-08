@@ -7,8 +7,8 @@ import 'package:video_player/video_player.dart';
 
 class AddNewFeed extends StatefulWidget {
   final bool isLoading;
-  final Function(String title, String des, BuildContext cc, List photoData)
-      submit;
+  final Function(String title, String des, BuildContext cc, List photoData,
+      List videoData) submit;
   AddNewFeed(this.isLoading, this.submit);
   @override
   _AddNewFeedState createState() => _AddNewFeedState();
@@ -24,6 +24,7 @@ class _AddNewFeedState extends State<AddNewFeed> {
   var _pickedImage;
   var _pickfromGallery;
   var photoData = [];
+  var videoData = [];
 
   final ImagePicker _picker = ImagePicker();
   void _pickImage() async {
@@ -34,9 +35,8 @@ class _AddNewFeedState extends State<AddNewFeed> {
       imageQuality: 95,
       // rotate: 90,
     );
-    print(pickImageFile!.path.length);
     setState(() {
-      _pickedImage = File(pickImageFile.path);
+      _pickedImage = File(pickImageFile!.path);
       photoData.add(_pickedImage);
       // testCompressFile(_pickedImage);
     });
@@ -55,6 +55,10 @@ class _AddNewFeedState extends State<AddNewFeed> {
   //   print(result.lengthInBytes);
   //   return result;
   // }
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   void _pickFromGallery() async {
     final pickImageGallery = await _picker.getImage(
@@ -78,9 +82,9 @@ class _AddNewFeedState extends State<AddNewFeed> {
     _video = File(pickedFile!.path);
     _controller = VideoPlayerController.file(_video)
       ..addListener(() => setState(() {
-            photoData.add(_video);
+            videoData.add(_video.path);
           }))
-      ..setLooping(true)
+      ..setLooping(false)
       ..initialize();
   }
 
@@ -129,7 +133,8 @@ class _AddNewFeedState extends State<AddNewFeed> {
   }
 
   _trySaving() {
-    widget.submit(whocanvalue, _message, context, photoData);
+    if (_message.isNotEmpty || photoData.isNotEmpty)
+      widget.submit(whocanvalue, _message, context, photoData, videoData);
   }
 
   @override
@@ -150,12 +155,6 @@ class _AddNewFeedState extends State<AddNewFeed> {
   }
 
   @override
-  void dispose() {
-    // _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
     return !widget.isLoading
@@ -173,7 +172,11 @@ class _AddNewFeedState extends State<AddNewFeed> {
                   icon: Icon(Icons.close),
                   color: Theme.of(context).primaryColor),
               actions: [
-                TextButton(onPressed: _trySaving, child: Text('Post')),
+                TextButton(
+                    onPressed: _message.isNotEmpty || photoData.isNotEmpty
+                        ? _trySaving
+                        : null,
+                    child: Text('Post')),
               ],
               automaticallyImplyLeading: false,
               backgroundColor: Theme.of(context).canvasColor,
@@ -339,109 +342,9 @@ class _AddNewFeedState extends State<AddNewFeed> {
                                           });
                                         }),
                                   )
-                                  // Dismissible(
-                                  //     key: Key(photoData[index].toString()),
-                                  //     onDismissed: (direction) {
-                                  //       setState(() {
-                                  //         photoData.removeAt(index);
-                                  //       });
-                                  //     },
-                                  //     child: Icon(Icons.close, size: 32)),
                                 ]);
                           }),
-                    // photoData.length == 1
-                    // ? Stack(textDirection: TextDirection.rtl, children: [
-                    //     Container(
-                    //       padding: const EdgeInsets.all(8),
-                    //       // color: Colors.amber,
-                    //       width: MediaQuery.of(context).size.width,
-                    //       height: MediaQuery.of(context).size.height / 2,
-                    //       child: Image.file(
-                    //         _pickedImage != null
-                    //             ? _pickedImage
-                    //             : _pickfromGallery != null
-                    //                 ? _pickfromGallery
-                    //                 : _video,
-                    //         fit: BoxFit.cover,
-                    //       ),
-                    //     ),
-                    //     Container(
-                    //         padding: const EdgeInsets.all(8),
-                    //         child: Icon(Icons.close, size: 32)),
-                    //   ])
-                    //     : Row(
-                    //         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    //         children: [
-                    //           // Container(
-                    //           //   child: _pickedImage != null
-                    //           //       ? Image.file(_pickedImage)
-                    //           //       : null,
-                    //           // ),
-                    //           if (_pickedImage != null)
-                    //             Stack(
-                    //                 textDirection: TextDirection.rtl,
-                    //                 children: [
-                    //                   Container(
-                    //                       padding: const EdgeInsets.all(8),
-                    //                       color: Colors.amber,
-                    //                       width: MediaQuery.of(context)
-                    //                               .size
-                    //                               .width -
-                    //                           50 * (photoData.length + 1),
-                    //                       height: MediaQuery.of(context)
-                    //                               .size
-                    //                               .height /
-                    //                           2,
-                    //                       child: Image.file(
-                    //                         _pickedImage,
-                    //                         fit: BoxFit.cover,
-                    //                       )),
-                    //                   Container(
-                    //                       padding: const EdgeInsets.all(8),
-                    //                       child: Icon(Icons.close, size: 32)),
-                    //                 ]),
-                    //           if (_pickfromGallery != null)
-                    //             Stack(
-                    //                 textDirection: TextDirection.rtl,
-                    //                 children: [
-                    //                   Container(
-                    //                     padding: const EdgeInsets.all(8),
-                    //                     // color: Colors.amber,
-                    //                     width:
-                    //                         MediaQuery.of(context).size.width -
-                    //                             50 * (photoData.length + 1),
-                    //                     height:
-                    //                         MediaQuery.of(context).size.height /
-                    //                             2,
-                    //                     child: _pickfromGallery != null
-                    //                         ? Image.file(
-                    //                             _pickfromGallery,
-                    //                             fit: BoxFit.cover,
-                    //                           )
-                    //                         : null,
-                    //                   ),
-                    //                   Container(
-                    //                       padding: const EdgeInsets.all(8),
-                    //                       child: Icon(Icons.close, size: 32)),
-                    //                 ]),
-                    // Container(
-                    //   // width: MediaQuery.of(context).size.width,
-                    //   child: _pickedImage != null
-                    //       ? Image.file(_pickedImage)
-                    //       : null,
-                    // ),
-                    // Container(
-                    //   child: _pickfromGallery != null
-                    //       ? Image.file(_pickfromGallery)
-                    //       : null,
-                    // ),
-                    // Container(
-                    //   child: _pickfromGallery != null
-                    //       ? Image.file(_pickfromGallery)
-                    //       : null,
-                    // ),
-                    // ],
-                    // ),
+
                     if (_video != null)
                       Container(
                         margin: const EdgeInsets.symmetric(vertical: 25),

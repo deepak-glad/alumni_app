@@ -1,13 +1,19 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:test_appp/api/comment_api.dart';
+import 'package:test_appp/module/comment_model.dart';
 
 class CommentScreen extends StatefulWidget {
+  final String postId;
+  final likecount;
+  final commentcount;
   final String profileImage;
   var image = [];
   final String name;
   final String batchYear;
   bool isLiked;
 
-  CommentScreen(
+  CommentScreen(this.postId, this.likecount, this.commentcount,
       this.profileImage, this.image, this.name, this.batchYear, this.isLiked);
 
   @override
@@ -20,12 +26,23 @@ class _CommentScreenState extends State<CommentScreen> {
   _trySave() {
     FocusScope.of(context).unfocus();
     print(_enteredComment);
+    commentData(widget.postId, _enteredComment);
     _editingController.clear();
   }
 
+  late Future<Comment> _future;
+  void initState() {
+    setState(() {
+      _future = CommentGetData(widget.postId);
+    });
+    super.initState();
+  }
+
+  CarouselController buttonCarouselController = CarouselController();
+  var _current = 0;
   @override
   Widget build(BuildContext context) {
-    for (var im in widget.image) print(im.url);
+    print(widget.isLiked);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).canvasColor,
@@ -63,7 +80,66 @@ class _CommentScreenState extends State<CommentScreen> {
                         ),
                       ),
                       // Text(widget.description, overflow: TextOverflow.visible),
-                      for (var im in widget.image) Image.network(im.url),
+                      CarouselSlider(
+                        items: widget.image
+                            .map((e) => Container(
+                                  color: Theme.of(context).primaryColor,
+                                  child: Image.network(
+                                    e.url,
+                                    width: MediaQuery.of(context).size.width,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ))
+                            .toList(),
+                        carouselController: buttonCarouselController,
+                        options: CarouselOptions(
+                            // height: 300,
+                            autoPlay: false,
+                            viewportFraction: 1.0,
+                            enlargeCenterPage: true,
+                            enableInfiniteScroll: false,
+                            aspectRatio: 1.0,
+                            onPageChanged: (index, reason) {
+                              setState(() {
+                                _current = index;
+                              });
+                            }),
+                      ),
+                      if (widget.image.length > 1)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: widget.image.asMap().entries.map((entry) {
+                            return GestureDetector(
+                              onTap: () => buttonCarouselController
+                                  .animateToPage(entry.key),
+                              child: Container(
+                                width: 8.0,
+                                height: 7.0,
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 8.0, horizontal: 4.0),
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: (Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.white
+                                            : Colors.black)
+                                        .withOpacity(
+                                            _current == entry.key ? 0.9 : 0.4)),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(' ${widget.likecount} like'),
+                            Text('${widget.commentcount} comment')
+                          ],
+                        ),
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -71,16 +147,19 @@ class _CommentScreenState extends State<CommentScreen> {
                               style: ButtonStyle(
                                 foregroundColor: widget.isLiked
                                     ? MaterialStateProperty.all<Color>(
-                                        Theme.of(context).primaryColor)
+                                        Theme.of(context).bottomAppBarColor)
                                     : MaterialStateProperty.all<Color>(
                                         Colors.grey),
                               ),
                               onPressed: () {
                                 setState(() {
+                                  // widget.isLiked = !widget.isLiked;
                                   widget.isLiked = !widget.isLiked;
                                 });
                               },
-                              icon: Icon(Icons.thumb_up),
+                              icon: Icon(widget.isLiked
+                                  ? Icons.thumb_up
+                                  : Icons.thumb_up_alt_outlined),
                               label: Text('like')),
                           TextButton.icon(
                               style: ButtonStyle(
@@ -148,14 +227,18 @@ class _CommentScreenState extends State<CommentScreen> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                   ),
                 ),
-                Container(
-                  child: ListTile(
-                    leading: CircleAvatar(),
-                    title: Text('NAme'),
-                    subtitle: Text('Fresher'),
-                    trailing: Text('time'),
-                  ),
-                )
+                FutureBuilder<Comment>(
+                    future: _future,
+                    builder: (context, snapshot) {
+                      return Container(
+                        child: ListTile(
+                          leading: CircleAvatar(),
+                          title: Text('NAme'),
+                          subtitle: Text('Fresher'),
+                          trailing: Text('time'),
+                        ),
+                      );
+                    }),
               ]),
         ),
       ),

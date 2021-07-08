@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:test_appp/api/feed_get_api.dart';
+import 'package:test_appp/api/like_dislike_api.dart';
 import 'package:test_appp/module/feed_get.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import '/module/home_data.dart';
@@ -16,7 +18,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<Feeds> _future;
-
+  CarouselController buttonCarouselController = CarouselController();
+  var _current = 0;
+  bool _descmore = false;
+  bool like = false;
+  var mediaData = [];
+  List<bool> _likes = List.filled(15, false);
+  var idDataLike = [];
   @override
   void initState() {
     setState(() {
@@ -32,22 +40,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future _onPull() async {
+    await Future.delayed(Duration(milliseconds: 1000));
     setState(() {
-      feedApiData();
+      _future = feedApiData();
     });
   }
 
-  CarouselController buttonCarouselController = CarouselController();
-  var _current = 0;
-  bool _descmore = false;
-  bool like = false;
-  var mediaData = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder<Feeds>(
           future: _future,
           builder: (context, snapshot) {
+            // if(snapshot.connectionState!=ConnectionState.waiting)
             if (snapshot.hasData) {
               if (snapshot.data!.data.length == 0) {
                 return Container(
@@ -67,8 +72,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemCount: snapshot.data!.data.length,
                     itemBuilder: (context, index) {
                       var apiData = snapshot.data!.data[index];
-                      // print(apiData.alumni.mediaUrl);
-                      for (var image in apiData.mediaUrl) mediaData.add(image);
                       return Column(children: [
                         if (index == 0)
                           GestureDetector(
@@ -132,89 +135,45 @@ class _HomeScreenState extends State<HomeScreen> {
                                   overflow: TextOverflow.visible,
                                 ),
                               ),
-                              // InkWell(
-                              //   onTap: () {
-                              //     setState(() {
-                              //       _descmore = !_descmore;
-                              //     });
-                              //   },
-                              //   child: Row(
-                              //     mainAxisAlignment: MainAxisAlignment.end,
-                              //     children: <Widget>[
-                              //       _descmore
-                              //           ? Text(
-                              //               "Show Less",
-                              //               style: TextStyle(
-                              //                   color: Theme.of(context)
-                              //                       .primaryColor),
-                              //             )
-                              //           : Text("Show More",
-                              //               style: TextStyle(
-                              //                   color: Theme.of(context)
-                              //                       .primaryColor))
-                              //     ],
-                              //   ),
-                              // ),
-                              // if (apiData.mediaUrl.isNotEmpty)
-                              // for (var image in apiData.mediaUrl)
-                              //     Image.network(
-                              //       image.url,
-                              //       height:
-                              //           MediaQuery.of(context).size.height / 2 -
-                              //               20,
-                              //       fit: BoxFit.fitWidth,
-                              //       width: MediaQuery.of(context).size.width,
-                              //     ),
-                              // CarouselSlider(
-                              //   items: apiData.mediaUrl
-                              // .map((e) => Container(
-                              //       child: Image.network(e.url),
-                              //     ))
-                              // .toList(),
-                              //   carouselController: buttonCarouselController,
-                              //   options: CarouselOptions(
-                              //     autoPlay: true,
-                              //     enlargeCenterPage: true,
-                              //     viewportFraction: 0.9,
-                              //     aspectRatio: 2.0,
-                              //     initialPage: 2,
-                              //     enableInfiniteScroll: false,
-                              //   ),
-                              // ),
-                              // RaisedButton(
-                              //   onPressed: () =>
-                              //       buttonCarouselController.nextPage(
-                              //           duration: Duration(milliseconds: 100),
-                              //           curve: Curves.linear),
-                              //   child: Text('→'),
-                              // ),
-                              CarouselSlider(
-                                items: apiData.mediaUrl
-                                    .map((e) => Container(
-                                          color: Theme.of(context).primaryColor,
-                                          child: Image.network(
-                                            e.url,
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ))
-                                    .toList(),
-                                carouselController: buttonCarouselController,
-                                options: CarouselOptions(
-                                    // height: 300,
-                                    autoPlay: false,
-                                    viewportFraction: 1.0,
-                                    enlargeCenterPage: true,
-                                    enableInfiniteScroll: false,
-                                    aspectRatio: 1.0,
-                                    onPageChanged: (index, reason) {
-                                      setState(() {
-                                        _current = index;
-                                      });
-                                    }),
-                              ),
+                              if (apiData.mediaUrl.isNotEmpty)
+                                CarouselSlider(
+                                  items: apiData.mediaUrl
+                                      .map((e) => Container(
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            // child: Image.network(
+                                            //   e.url,
+                                            // width: MediaQuery.of(context)
+                                            //     .size
+                                            //     .width,
+                                            // fit: BoxFit.cover,
+                                            // ),
+                                            child: CachedNetworkImage(
+                                              imageUrl: e.url,
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      Icon(Icons.broken_image),
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ))
+                                      .toList(),
+                                  carouselController: buttonCarouselController,
+                                  options: CarouselOptions(
+                                      // height: 300,
+                                      autoPlay: false,
+                                      viewportFraction: 1.0,
+                                      enlargeCenterPage: true,
+                                      enableInfiniteScroll: false,
+                                      aspectRatio: 1.0,
+                                      onPageChanged: (index, reason) {
+                                        setState(() {
+                                          _current = index;
+                                        });
+                                      }),
+                                ),
                               if (apiData.mediaUrl.length > 1)
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -253,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                        ' ${apiData.likeCount == null ? '0' : apiData.likeCount} like'),
+                                        ' ${apiData.likeCount == null ? '0' : idDataLike.length} like'),
                                     Text(
                                         '${apiData.comments.length < 1 ? '0' : apiData.likeCount} comment')
                                   ],
@@ -265,19 +224,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                 children: [
                                   TextButton.icon(
                                       style: ButtonStyle(
-                                        foregroundColor: like
+                                        foregroundColor: !_likes[index]
                                             ? MaterialStateProperty.all<Color>(
-                                                Theme.of(context)
-                                                    .bottomAppBarColor)
+                                                Colors.grey)
                                             : MaterialStateProperty.all<Color>(
-                                                Colors.grey),
+                                                Theme.of(context)
+                                                    .bottomAppBarColor),
                                       ),
                                       onPressed: () {
+                                        if (idDataLike.isNotEmpty)
+                                          idDataLike.forEach((element) {
+                                            print('d');
+                                            likeDisLike(element);
+                                          });
                                         setState(() {
-                                          like = !like;
+                                          _likes[index] = !_likes[index];
                                         });
+                                        _likes[index]
+                                            ? idDataLike.add(apiData.id)
+                                            : idDataLike.remove(apiData.id);
+                                        print(idDataLike.length);
+
+                                        // likeDisLike(apiData.id);
                                       },
-                                      icon: !like
+                                      icon: !_likes[index]
                                           ? Icon(Icons.thumb_up_alt_outlined)
                                           : Icon(Icons.thumb_up),
                                       label: Text('like')),
@@ -290,22 +260,27 @@ class _HomeScreenState extends State<HomeScreen> {
                                       onPressed: () {
                                         if (apiData.mediaUrl.isNotEmpty)
                                           // for (var image in apiData.mediaUrl)
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (BuildContext
-                                                          context) =>
-                                                      CommentScreen(
-                                                          apiData.alumni
-                                                                      .mediaUrl ==
-                                                                  null
-                                                              ? 'null'
-                                                              : apiData.alumni
-                                                                  .mediaUrl,
-                                                          apiData.mediaUrl,
-                                                          '${apiData.alumni.firstName} ${apiData.alumni.lastName}',
-                                                          apiData.alumni.college
-                                                              .name,
-                                                          like)));
+                                          Navigator.of(context).push(MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  CommentScreen(
+                                                      apiData.id,
+                                                      apiData.likeCount == null
+                                                          ? '0'
+                                                          : idDataLike.length,
+                                                      apiData.comments.length <
+                                                              1
+                                                          ? '0'
+                                                          : apiData.likeCount,
+                                                      apiData.alumni.mediaUrl ==
+                                                              null
+                                                          ? 'null'
+                                                          : apiData
+                                                              .alumni.mediaUrl,
+                                                      apiData.mediaUrl,
+                                                      '${apiData.alumni.firstName} ${apiData.alumni.lastName}',
+                                                      apiData
+                                                          .alumni.college.name,
+                                                      _likes[index])));
                                       },
                                       icon: Icon(Icons.comment_rounded)),
                                   TextButton.icon(
