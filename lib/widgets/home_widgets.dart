@@ -69,6 +69,7 @@ class _HomePageState extends State<HomePage> {
     var message = 'you can not post anything ';
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        behavior: SnackBarBehavior.floating,
         dismissDirection: DismissDirection.startToEnd,
         duration: Duration(seconds: 3),
         content: Text(message),

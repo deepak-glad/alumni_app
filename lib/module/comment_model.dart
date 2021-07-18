@@ -35,33 +35,42 @@ class Data {
     required this.comments,
     required this.id,
     required this.likeCount,
+    required this.createdAt,
+    required this.updatedAt,
     required this.commentCount,
   });
 
-  List<dynamic> likesUser;
+  List<LikesUser> likesUser;
   List<CommentElement> comments;
   String id;
-  int likeCount;
-  int commentCount;
+  var likeCount;
+  DateTime createdAt;
+  DateTime updatedAt;
+  var commentCount;
 
   factory Data.fromRawJson(String str) => Data.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-        likesUser: List<dynamic>.from(json["likesUser"].map((x) => x)),
+        likesUser: List<LikesUser>.from(
+            json["likesUser"].map((x) => LikesUser.fromJson(x))),
         comments: List<CommentElement>.from(
             json["comments"].map((x) => CommentElement.fromJson(x))),
         id: json["_id"],
         likeCount: json["likeCount"],
+        createdAt: DateTime.parse(json["createdAt"]),
+        updatedAt: DateTime.parse(json["updatedAt"]),
         commentCount: json["commentCount"],
       );
 
   Map<String, dynamic> toJson() => {
-        "likesUser": List<dynamic>.from(likesUser.map((x) => x)),
+        "likesUser": List<dynamic>.from(likesUser.map((x) => x.toJson())),
         "comments": List<dynamic>.from(comments.map((x) => x.toJson())),
         "_id": id,
         "likeCount": likeCount,
+        "createdAt": createdAt.toIso8601String(),
+        "updatedAt": updatedAt.toIso8601String(),
         "commentCount": commentCount,
       };
 }
@@ -74,14 +83,20 @@ class CommentElement {
     required this.alumni,
     required this.comment,
     required this.post,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.replyCount,
   });
 
-  List<dynamic> replies;
+  List<Reply> replies;
   String id;
   dynamic user;
   Alumni alumni;
   String comment;
   String post;
+  DateTime createdAt;
+  DateTime updatedAt;
+  var replyCount;
 
   factory CommentElement.fromRawJson(String str) =>
       CommentElement.fromJson(json.decode(str));
@@ -89,7 +104,8 @@ class CommentElement {
   String toRawJson() => json.encode(toJson());
 
   factory CommentElement.fromJson(Map<String, dynamic> json) => CommentElement(
-        replies: List<dynamic>.from(json["replies"].map((x) => x)),
+        replies:
+            List<Reply>.from(json["replies"].map((x) => Reply.fromJson(x))),
         id: json["_id"],
         user: json["user"],
         alumni: json["alumni"] == null
@@ -97,15 +113,21 @@ class CommentElement {
             : Alumni.fromJson(json["alumni"]),
         comment: json["comment"],
         post: json["post"],
+        createdAt: DateTime.parse(json["createdAt"]),
+        updatedAt: DateTime.parse(json["updatedAt"]),
+        replyCount: json["replyCount"] == null ? null : json["replyCount"],
       );
 
   Map<String, dynamic> toJson() => {
-        "replies": List<dynamic>.from(replies.map((x) => x)),
+        "replies": List<dynamic>.from(replies.map((x) => x.toJson())),
         "_id": id,
         "user": user,
         "alumni": alumni.toJson(),
         "comment": comment,
         "post": post,
+        "createdAt": createdAt.toIso8601String(),
+        "updatedAt": updatedAt.toIso8601String(),
+        "replyCount": replyCount == null ? null : replyCount,
       };
 }
 
@@ -122,7 +144,7 @@ class Alumni {
   String firstName;
   String lastName;
   String email;
-  String college;
+  College college;
 
   factory Alumni.fromRawJson(String str) => Alumni.fromJson(json.decode(str));
 
@@ -133,7 +155,7 @@ class Alumni {
         firstName: json["firstName"],
         lastName: json["lastName"],
         email: json["email"],
-        college: json["college"],
+        college: College.fromJson(json["college"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -141,6 +163,111 @@ class Alumni {
         "firstName": firstName,
         "lastName": lastName,
         "email": email,
-        "college": college,
+        "college": college.toJson(),
+      };
+}
+
+class College {
+  College({
+    required this.id,
+    required this.name,
+  });
+
+  String id;
+  String name;
+
+  factory College.fromRawJson(String str) => College.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory College.fromJson(Map<String, dynamic> json) => College(
+        id: json["_id"],
+        name: json["name"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "_id": id,
+        "name": name,
+      };
+}
+
+class Reply {
+  Reply({
+    required this.id,
+    required this.user,
+    required this.alumni,
+    required this.reply,
+  });
+
+  String id;
+  dynamic user;
+  Alumni alumni;
+  String reply;
+
+  factory Reply.fromRawJson(String str) => Reply.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory Reply.fromJson(Map<String, dynamic> json) => Reply(
+        id: json["_id"],
+        user: json["user"],
+        alumni: json["alumni"] == null
+            ? Alumni.fromJson(json["user"])
+            : Alumni.fromJson(json["alumni"]),
+        reply: json["reply"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "_id": id,
+        "user": user,
+        "alumni": alumni.toJson(),
+        "reply": reply,
+      };
+}
+
+class LikesUser {
+  LikesUser({
+    required this.id,
+    required this.user,
+    required this.alumni,
+    required this.post,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.v,
+  });
+
+  String id;
+  var user;
+  var alumni;
+  String post;
+  DateTime createdAt;
+  DateTime updatedAt;
+  var v;
+
+  factory LikesUser.fromRawJson(String str) =>
+      LikesUser.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory LikesUser.fromJson(Map<String, dynamic> json) => LikesUser(
+        id: json["_id"],
+        user: json["user"],
+        alumni: json["alumni"] == null
+            ? Alumni.fromJson(json["user"])
+            : Alumni.fromJson(json["alumni"]),
+        post: json["post"],
+        createdAt: DateTime.parse(json["createdAt"]),
+        updatedAt: DateTime.parse(json["updatedAt"]),
+        v: json["__v"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "_id": id,
+        "user": user == null ? null : user.toJson(),
+        "alumni": alumni == null ? null : alumni.toJson(),
+        "post": post,
+        "createdAt": createdAt.toIso8601String(),
+        "updatedAt": updatedAt.toIso8601String(),
+        "__v": v,
       };
 }

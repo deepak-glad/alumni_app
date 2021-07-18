@@ -1,9 +1,9 @@
-// To parse this JSON data, do
-//
-//     final feeds = feedsFromJson(jsonString);
-
 import 'package:meta/meta.dart';
 import 'dart:convert';
+
+Feeds feedsFromJson(String str) => Feeds.fromJson(json.decode(str));
+
+String feedsToJson(Feeds data) => json.encode(data.toJson());
 
 class Feeds {
   Feeds({
@@ -13,10 +13,6 @@ class Feeds {
 
   bool status;
   List<Datum> data;
-
-  factory Feeds.fromRawJson(String str) => Feeds.fromJson(json.decode(str));
-
-  String toRawJson() => json.encode(toJson());
 
   factory Feeds.fromJson(Map<String, dynamic> json) => Feeds(
         status: json["status"],
@@ -43,29 +39,26 @@ class Datum {
     required this.updatedAt,
   });
 
-  List<dynamic> likesUser;
-  List<dynamic> comments;
+  List<LikesUser> likesUser;
+  List<String> comments;
   String id;
-  String title;
+  var title;
   String discription;
-  dynamic likeCount;
-  Alumni alumni;
+  int likeCount;
+  DatumAlumni alumni;
   List<MediaUrl> mediaUrl;
   DateTime createdAt;
   DateTime updatedAt;
 
-  factory Datum.fromRawJson(String str) => Datum.fromJson(json.decode(str));
-
-  String toRawJson() => json.encode(toJson());
-
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        likesUser: List<dynamic>.from(json["likesUser"].map((x) => x)),
-        comments: List<dynamic>.from(json["comments"].map((x) => x)),
+        likesUser: List<LikesUser>.from(
+            json["likesUser"].map((x) => LikesUser.fromJson(x))),
+        comments: List<String>.from(json["comments"].map((x) => x)),
         id: json["_id"],
-        title: json["title"],
+        title: titleValues.map[json["title"]],
         discription: json["discription"],
         likeCount: json["likeCount"],
-        alumni: Alumni.fromJson(json["alumni"]),
+        alumni: DatumAlumni.fromJson(json["alumni"]),
         mediaUrl: List<MediaUrl>.from(
             json["MediaUrl"].map((x) => MediaUrl.fromJson(x))),
         createdAt: DateTime.parse(json["createdAt"]),
@@ -73,10 +66,10 @@ class Datum {
       );
 
   Map<String, dynamic> toJson() => {
-        "likesUser": List<dynamic>.from(likesUser.map((x) => x)),
+        "likesUser": List<dynamic>.from(likesUser.map((x) => x.toJson())),
         "comments": List<dynamic>.from(comments.map((x) => x)),
         "_id": id,
-        "title": title,
+        "title": titleValues.reverse[title],
         "discription": discription,
         "likeCount": likeCount,
         "alumni": alumni.toJson(),
@@ -86,8 +79,8 @@ class Datum {
       };
 }
 
-class Alumni {
-  Alumni({
+class DatumAlumni {
+  DatumAlumni({
     required this.id,
     required this.firstName,
     required this.lastName,
@@ -96,18 +89,14 @@ class Alumni {
     required this.college,
   });
 
-  String id;
-  String firstName;
-  String lastName;
+  var id;
+  var firstName;
+  var lastName;
   bool alumni;
   dynamic mediaUrl;
   College college;
 
-  factory Alumni.fromRawJson(String str) => Alumni.fromJson(json.decode(str));
-
-  String toRawJson() => json.encode(toJson());
-
-  factory Alumni.fromJson(Map<String, dynamic> json) => Alumni(
+  factory DatumAlumni.fromJson(Map<String, dynamic> json) => DatumAlumni(
         id: json["_id"],
         firstName: json["firstName"],
         lastName: json["lastName"],
@@ -150,6 +139,76 @@ class College {
       };
 }
 
+class LikesUser {
+  LikesUser({
+    required this.id,
+    required this.alumni,
+    required this.post,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.v,
+  });
+
+  String id;
+  UserClass alumni;
+  String post;
+  DateTime createdAt;
+  DateTime updatedAt;
+  int v;
+
+  factory LikesUser.fromJson(Map<String, dynamic> json) => LikesUser(
+        id: json["_id"],
+        alumni: json["alumni"] == null
+            ? UserClass.fromJson(json["user"])
+            : UserClass.fromJson(json["alumni"]),
+        post: json["post"],
+        createdAt: DateTime.parse(json["createdAt"]),
+        updatedAt: DateTime.parse(json["updatedAt"]),
+        v: json["__v"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "_id": id,
+        "alumni": alumni == null ? null : alumni.toJson(),
+        "post": post,
+        "createdAt": createdAt.toIso8601String(),
+        "updatedAt": updatedAt.toIso8601String(),
+        "__v": v,
+      };
+}
+
+class UserClass {
+  UserClass({
+    required this.id,
+    required this.firstName,
+    required this.lastName,
+    required this.email,
+    required this.college,
+  });
+
+  String id;
+  String firstName;
+  String lastName;
+  String email;
+  College college;
+
+  factory UserClass.fromJson(Map<String, dynamic> json) => UserClass(
+        id: json["_id"],
+        firstName: json["firstName"],
+        lastName: json["lastName"],
+        email: json["email"],
+        college: College.fromJson(json["college"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "_id": id,
+        "firstName": firstName,
+        "lastName": lastName,
+        "email": email,
+        "college": college.toJson(),
+      };
+}
+
 class MediaUrl {
   MediaUrl({
     required this.id,
@@ -158,11 +217,6 @@ class MediaUrl {
 
   String id;
   String url;
-
-  factory MediaUrl.fromRawJson(String str) =>
-      MediaUrl.fromJson(json.decode(str));
-
-  String toRawJson() => json.encode(toJson());
 
   factory MediaUrl.fromJson(Map<String, dynamic> json) => MediaUrl(
         id: json["_id"],
@@ -173,4 +227,23 @@ class MediaUrl {
         "_id": id,
         "url": url,
       };
+}
+
+enum Title { ANYONE, CONNECTION_ONLY }
+
+final titleValues = EnumValues(
+    {"anyone": Title.ANYONE, "connection Only": Title.CONNECTION_ONLY});
+
+class EnumValues<T> {
+  Map<String, T> map;
+  late Map<T, String> reverseMap;
+
+  EnumValues(this.map);
+
+  Map<T, String> get reverse {
+    if (reverseMap == null) {
+      reverseMap = map.map((k, v) => new MapEntry(v, k));
+    }
+    return reverseMap;
+  }
 }

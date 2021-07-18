@@ -1,22 +1,28 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:test_appp/api/comment_api.dart';
+import 'package:test_appp/api/like_dislike_api.dart';
 import 'package:test_appp/module/comment_model.dart';
+import 'package:test_appp/sub_screen/reply_commet.dart';
+import 'package:test_appp/widgets/comment_structure.dart';
+import 'package:test_appp/widgets/reply_commnet_structure.dart';
 
 class CommentScreen extends StatefulWidget {
   final String postId;
   final likecount;
   final commentcount;
   final String profileImage;
-  var image = [];
+  final List image;
   final String name;
   final String batchYear;
-  bool isLiked;
+  // bool isLiked;
+  final List liked;
 
   CommentScreen(this.postId, this.likecount, this.commentcount,
-      this.profileImage, this.image, this.name, this.batchYear, this.isLiked);
+      this.profileImage, this.image, this.name, this.batchYear, this.liked);
 
   @override
   _CommentScreenState createState() => _CommentScreenState();
@@ -40,12 +46,17 @@ class _CommentScreenState extends State<CommentScreen> {
     super.initState();
   }
 
+  Future _onPull() async {
+    await Future.delayed(Duration(milliseconds: 1000));
+    setState(() {
+      _future = commentgetdata(widget.postId);
+    });
+  }
+
   CarouselController buttonCarouselController = CarouselController();
   var _current = 0;
   @override
   Widget build(BuildContext context) {
-    // commentgetdata(widget.postId);
-    // print(widget.postId);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).canvasColor,
@@ -55,8 +66,12 @@ class _CommentScreenState extends State<CommentScreen> {
       body: Container(
         height: MediaQuery.of(context).size.height - 130,
         padding: const EdgeInsets.all(5.0),
-        child: SingleChildScrollView(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+        child: RefreshIndicator(
+          onRefresh: _onPull,
+          child: ListView(
+              shrinkWrap: true,
+              physics: AlwaysScrollableScrollPhysics(),
+              // crossAxisAlignment: CrossAxisAlignment.start,
               // mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Card(
@@ -66,8 +81,9 @@ class _CommentScreenState extends State<CommentScreen> {
                       ListTile(
                         leading: widget.profileImage != 'null'
                             ? CircleAvatar(
-                                backgroundImage:
-                                    NetworkImage(widget.profileImage))
+                                // backgroundImage:
+                                // NetworkImage(widget.profileImage)
+                                )
                             : CircleAvatar(
                                 backgroundImage:
                                     AssetImage('assets/profile.png'),
@@ -87,8 +103,10 @@ class _CommentScreenState extends State<CommentScreen> {
                         items: widget.image
                             .map((e) => Container(
                                   color: Theme.of(context).primaryColor,
-                                  child: Image.network(
-                                    e.url,
+                                  child: CachedNetworkImage(
+                                    imageUrl: e.url,
+                                    errorWidget: (context, url, error) =>
+                                        Icon(Icons.broken_image),
                                     width: MediaQuery.of(context).size.width,
                                     fit: BoxFit.cover,
                                   ),
@@ -132,193 +150,286 @@ class _CommentScreenState extends State<CommentScreen> {
                             );
                           }).toList(),
                         ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0, vertical: 5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(' ${widget.likecount} like'),
-                            Text('${widget.commentcount} comment')
-                          ],
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          TextButton.icon(
-                              style: ButtonStyle(
-                                foregroundColor: widget.isLiked
-                                    ? MaterialStateProperty.all<Color>(
-                                        Theme.of(context).bottomAppBarColor)
-                                    : MaterialStateProperty.all<Color>(
-                                        Colors.grey),
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  // widget.isLiked = !widget.isLiked;
-                                  widget.isLiked = !widget.isLiked;
-                                });
-                              },
-                              icon: Icon(widget.isLiked
-                                  ? Icons.thumb_up
-                                  : Icons.thumb_up_alt_outlined),
-                              label: Text('like')),
-                          TextButton.icon(
-                              style: ButtonStyle(
-                                  foregroundColor:
-                                      MaterialStateProperty.all<Color>(
-                                          Colors.grey)),
-                              label: Text('comment'),
-                              onPressed: () {},
-                              icon: Icon(Icons.comment_rounded)),
-                          TextButton.icon(
-                              style: ButtonStyle(
-                                  foregroundColor:
-                                      MaterialStateProperty.all<Color>(
-                                          Colors.grey)),
-                              onPressed: () {},
-                              icon: Icon(Icons.send_and_archive),
-                              label: Text('share')),
-                        ],
-                      ),
                     ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0, top: 10, bottom: 5),
-                  child: Text(
-                    'Reactions',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 9),
-                  height: 40,
-                  child: ListView(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      Stack(
-                          alignment: AlignmentDirectional.bottomEnd,
-                          children: [
-                            CircleAvatar(),
-                            Icon(
-                              Icons.thumb_up,
-                              color: Theme.of(context).primaryColor,
-                              size: 17,
-                            )
-                          ]),
-                      SizedBox(width: 5),
-                      Stack(
-                          alignment: AlignmentDirectional.bottomEnd,
-                          children: [
-                            CircleAvatar(),
-                            Icon(
-                              Icons.thumb_up,
-                              color: Theme.of(context).primaryColor,
-                              size: 17,
-                            )
-                          ]),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0, top: 10, bottom: 5),
-                  child: Text(
-                    'Comments',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                   ),
                 ),
                 FutureBuilder<Comment>(
                     future: _future,
                     builder: (context, snapshot) {
-                      print(snapshot.data);
                       if (snapshot.hasData) {
-                        return ListView.builder(
-                            physics: NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: snapshot.data!.data.comments.length,
-                            itemBuilder: (context, index) {
-                              var dta = snapshot.data!.data;
-                              return Container(
-                                width: MediaQuery.of(context).size.width,
-                                child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                          width: 80, child: CircleAvatar()),
-                                      Container(
-                                        width:
-                                            MediaQuery.of(context).size.width -
-                                                100,
-                                        margin: const EdgeInsets.only(
-                                            right: 8, top: 10, bottom: 10),
-                                        padding: const EdgeInsets.all(8.0),
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            color: Colors.grey[200],
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black54,
-                                                blurRadius: .5,
-                                              ),
-                                            ]),
-                                        child: Column(
+                        if (snapshot.data!.data.comments.length > 0) {
+                          return ListView.builder(
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: snapshot.data!.data.comments.length,
+                              itemBuilder: (context, index) {
+                                var dta = snapshot.data!.data;
+
+                                return Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    child: Column(children: [
+                                      if (index == 0)
+                                        Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
+                                            // Padding(
+                                            //   padding:
+                                            //       const EdgeInsets.symmetric(
+                                            //           horizontal: 8.0,
+                                            //           vertical: 5),
+                                            //   child: Row(
+                                            //     mainAxisAlignment:
+                                            //         MainAxisAlignment
+                                            //             .spaceBetween,
+                                            //     children: [
+                                            //       Text(
+                                            //           ' ${widget.likecount} like'),
+                                            //       Text(
+                                            //           '${widget.commentcount} comment')
+                                            //     ],
+                                            //   ),
+                                            // ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8.0,
+                                                      vertical: 5),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                      ' ${widget.liked.contains(dta.id) ? dta.likeCount + 1 : dta.likeCount} like'),
+                                                  Text(
+                                                      '${dta.comments.length < 1 ? '0' : dta.comments.length} comment')
+                                                ],
+                                              ),
+                                            ),
                                             Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
+                                                  MainAxisAlignment.spaceAround,
                                               children: [
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                              .symmetric(
-                                                          vertical: 5.0),
-                                                      child: Text(
-                                                        "${dta.comments[index].alumni.firstName} ${dta.comments[index].alumni.lastName}",
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 16),
-                                                      ),
+                                                TextButton.icon(
+                                                    style: ButtonStyle(
+                                                      foregroundColor: widget
+                                                              .liked
+                                                              .contains(dta.id)
+                                                          ? MaterialStateProperty.all<
+                                                              Color>(Theme.of(
+                                                                  context)
+                                                              .bottomAppBarColor)
+                                                          : MaterialStateProperty
+                                                              .all<Color>(
+                                                                  Colors.grey),
                                                     ),
-                                                    Text(snapshot
-                                                        .data!
-                                                        .data
-                                                        .comments[index]
-                                                        .alumni
-                                                        .college),
-                                                    // Text(snapshot.data!.data.likesUser[0])
-                                                  ],
-                                                ),
-                                                IconButton(
+                                                    onPressed: () {
+                                                      likeDisLike(dta.id);
+                                                      setState(() {
+                                                        widget.liked.contains(
+                                                                dta.id)
+                                                            ? widget.liked
+                                                                .remove(dta.id)
+                                                            : widget.liked
+                                                                .add(dta.id);
+                                                      });
+                                                    },
+                                                    icon: Icon(widget.liked
+                                                            .contains(dta.id)
+                                                        ? Icons.thumb_up
+                                                        : Icons
+                                                            .thumb_up_alt_outlined),
+                                                    label: Text('like')),
+                                                TextButton.icon(
+                                                    style: ButtonStyle(
+                                                        foregroundColor:
+                                                            MaterialStateProperty
+                                                                .all<Color>(
+                                                                    Colors
+                                                                        .grey)),
+                                                    label: Text('comment'),
                                                     onPressed: () {},
-                                                    icon: Icon(Icons.more_vert))
+                                                    icon: Icon(
+                                                        Icons.comment_rounded)),
+                                                TextButton.icon(
+                                                    style: ButtonStyle(
+                                                        foregroundColor:
+                                                            MaterialStateProperty
+                                                                .all<Color>(
+                                                                    Colors
+                                                                        .grey)),
+                                                    onPressed: () {},
+                                                    icon: Icon(
+                                                        Icons.send_and_archive),
+                                                    label: Text('share')),
                                               ],
                                             ),
-                                            // Icon(Icons.more_vert),
-                                            SizedBox(height: 15),
-
-                                            Text(
-                                              dta.comments[index].comment,
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.normal,
-                                                  fontSize: 16),
-                                            )
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 8.0,
+                                                  top: 10,
+                                                  bottom: 5),
+                                              child: Text(
+                                                'Reactions',
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 9),
+                                              height: 40,
+                                              child: ListView(
+                                                shrinkWrap: true,
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                children: [
+                                                  Stack(
+                                                      alignment:
+                                                          AlignmentDirectional
+                                                              .bottomEnd,
+                                                      children: [
+                                                        CircleAvatar(),
+                                                        Icon(
+                                                          Icons.thumb_up,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .primaryColor,
+                                                          size: 17,
+                                                        )
+                                                      ]),
+                                                  SizedBox(width: 5),
+                                                  Stack(
+                                                      alignment:
+                                                          AlignmentDirectional
+                                                              .bottomEnd,
+                                                      children: [
+                                                        CircleAvatar(),
+                                                        Icon(
+                                                          Icons.thumb_up,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .primaryColor,
+                                                          size: 17,
+                                                        )
+                                                      ]),
+                                                ],
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 8.0,
+                                                  top: 10,
+                                                  bottom: 5),
+                                              child: Text(
+                                                'Comments',
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                            ),
                                           ],
                                         ),
-                                      )
-                                    ]),
-                              );
-                            });
+                                      Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                                margin: const EdgeInsets.only(
+                                                    top: 10),
+                                                width: 60,
+                                                child: CircleAvatar()),
+                                            Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  CommentStructure(
+                                                      dta.comments[index].alumni
+                                                          .firstName,
+                                                      dta.comments[index].alumni
+                                                          .lastName,
+                                                      snapshot
+                                                          .data!
+                                                          .data
+                                                          .comments[index]
+                                                          .alumni
+                                                          .college
+                                                          .name,
+                                                      dta.comments[index]
+                                                          .comment),
+                                                  TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).push(MaterialPageRoute(
+                                                            builder: (BuildContext context) => ReplyComment(
+                                                                dta
+                                                                    .comments[
+                                                                        index]
+                                                                    .id,
+                                                                dta
+                                                                    .comments[
+                                                                        index]
+                                                                    .alumni
+                                                                    .firstName,
+                                                                dta
+                                                                    .comments[
+                                                                        index]
+                                                                    .alumni
+                                                                    .lastName,
+                                                                snapshot
+                                                                    .data!
+                                                                    .data
+                                                                    .comments[
+                                                                        index]
+                                                                    .alumni
+                                                                    .college
+                                                                    .name,
+                                                                dta
+                                                                    .comments[
+                                                                        index]
+                                                                    .comment,
+                                                                widget
+                                                                    .profileImage)));
+                                                      },
+                                                      child: Text('Reply')),
+                                                  if (dta.comments[index]
+                                                      .replies.isNotEmpty)
+                                                    Column(
+                                                        children: dta
+                                                            .comments[index]
+                                                            .replies
+                                                            .map<Widget>((e) =>
+                                                                REplyComment(
+                                                                    e.alumni
+                                                                        .firstName,
+                                                                    e.alumni
+                                                                        .lastName,
+                                                                    e
+                                                                        .alumni
+                                                                        .college
+                                                                        .name,
+                                                                    e.reply))
+                                                            .toList()),
+                                                  Divider(
+                                                      height: 10,
+                                                      color: Colors.black,
+                                                      thickness: 5),
+                                                ]),
+                                          ]),
+                                    ]));
+                              });
+                        }
+                        return Text('Be the first to comment');
+                      } else if (snapshot.hasError) {
+                        return Text('something went wrong try again later');
                       }
                       return Center(
                         child: CircularProgressIndicator(),
@@ -362,7 +473,7 @@ class _CommentScreenState extends State<CommentScreen> {
               ),
             ),
             TextButton(
-                onPressed: _enteredComment.isEmpty ? null : _trySave,
+                onPressed: _editingController.text.isEmpty ? null : _trySave,
                 child: Text('Post'))
           ],
         ),

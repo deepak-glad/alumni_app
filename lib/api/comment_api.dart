@@ -27,7 +27,6 @@ Future<Comment> commentgetdata(String id) async {
   var data;
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var value = prefs.getString('token');
-
   var url = Uri.parse(
       'https://alumni-supervision.herokuapp.com/post/likes-Comment/$id');
   http.Response reponse = await http.get(url, headers: {
@@ -40,4 +39,22 @@ Future<Comment> commentgetdata(String id) async {
   data = Comment.fromJson(jsonMap);
   print("$jsonMap geting datta");
   return data;
+}
+
+Future<void> replyComment(String commentId, String message) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  var value = prefs.getString('token');
+  var data = {"reply": message};
+  var url = Uri.parse(
+      'https://alumni-supervision.herokuapp.com/post/reply/$commentId');
+  http.Response reponse =
+      await http.patch(url, body: jsonEncode(data), headers: {
+    HttpHeaders.authorizationHeader: value.toString(),
+    "Accept": "application/json",
+    'Content-Type': 'application/json; charset=UTF-8',
+  });
+  final jsonBody = reponse.body;
+  final jsonMap = jsonDecode(jsonBody);
+  print('$jsonMap posting data');
 }

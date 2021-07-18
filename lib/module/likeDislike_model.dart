@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-class LikeDislike {
-  LikeDislike({
+class LikeDislikeModel {
+  LikeDislikeModel({
     required this.status,
     required this.data,
   });
@@ -9,12 +9,13 @@ class LikeDislike {
   bool status;
   Data data;
 
-  factory LikeDislike.fromRawJson(String str) =>
-      LikeDislike.fromJson(json.decode(str));
+  factory LikeDislikeModel.fromRawJson(String str) =>
+      LikeDislikeModel.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());
 
-  factory LikeDislike.fromJson(Map<String, dynamic> json) => LikeDislike(
+  factory LikeDislikeModel.fromJson(Map<String, dynamic> json) =>
+      LikeDislikeModel(
         status: json["status"],
         data: Data.fromJson(json["data"]),
       );

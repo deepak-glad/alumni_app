@@ -1,13 +1,17 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_appp/api/feed_get_api.dart';
 import 'package:test_appp/api/like_dislike_api.dart';
 import 'package:test_appp/module/feed_get.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import '/module/home_data.dart';
 import '/sub_screen/comment.dart';
 import '/sub_screen/search.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
   final controller;
@@ -21,28 +25,52 @@ class _HomeScreenState extends State<HomeScreen> {
   CarouselController buttonCarouselController = CarouselController();
   var _current = 0;
   bool _descmore = false;
-  bool like = false;
-  var mediaData = [];
-  List<bool> _likes = List.filled(15, false);
-  var idDataLike = [];
+  var _likeuser = [];
+  late List<Datum> _sortedArray = <Datum>[];
   @override
   void initState() {
     setState(() {
-      _future = feedApiData();
+      _future = loginUserId();
+      _future.then((value) {
+        var date = DateTime.now();
+        var sorted = value.data;
+        sorted.sort((a, b) => date.compareTo(b.createdAt));
+        _sortedArray = sorted;
+      });
     });
+
     super.initState();
   }
 
-  @override
-  void didChangeDependencies() {
-    _future = feedApiData();
-    super.didChangeDependencies();
+  var dd;
+  var value;
+  Future<Feeds> loginUserId() async {
+    var apiData;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var value = prefs.getString('token');
+    var url = Uri.parse('https://alumni-supervision.herokuapp.com/post/get');
+    http.Response reponse = await http.get(url, headers: {
+      HttpHeaders.authorizationHeader: value.toString(),
+    });
+    final jsonBody = reponse.body;
+    final jsonMap = jsonDecode(jsonBody);
+    var data = Feeds.fromJson(jsonMap);
+    apiData = Feeds.fromJson(jsonMap);
+    setState(() {
+      value = prefs.getString('id');
+      data.data.forEach((element) {
+        element.likesUser.map((e) => e.alumni.id).contains(value)
+            ? _likeuser.add(element.id)
+            : null;
+      });
+    });
+    return apiData;
   }
 
   Future _onPull() async {
     await Future.delayed(Duration(milliseconds: 1000));
     setState(() {
-      _future = feedApiData();
+      _future = loginUserId();
     });
   }
 
@@ -52,7 +80,6 @@ class _HomeScreenState extends State<HomeScreen> {
       body: FutureBuilder<Feeds>(
           future: _future,
           builder: (context, snapshot) {
-            // if(snapshot.connectionState!=ConnectionState.waiting)
             if (snapshot.hasData) {
               if (snapshot.data!.data.length == 0) {
                 return Container(
@@ -68,10 +95,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 onRefresh: _onPull,
                 child: ListView.builder(
                     controller: widget.controller,
+                    physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics()),
                     shrinkWrap: true,
                     itemCount: snapshot.data!.data.length,
                     itemBuilder: (context, index) {
-                      var apiData = snapshot.data!.data[index];
+                      var apiData = _sortedArray[index];
+                      // var date = DateTime.now();
+                      // var sorted = snapshot.data!.data;
+                      // sorted.sort((a, b) => date.compareTo(b.createdAt));
+                      // var apiData = sorted[index];
                       return Column(children: [
                         if (index == 0)
                           GestureDetector(
@@ -110,8 +143,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           elevation: 20.0,
                           // margin: const EdgeInsets.all(15),
                           child: Column(
-                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            // crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ListTile(
                                 leading: CircleAvatar(),
@@ -141,13 +172,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                       .map((e) => Container(
                                             color:
                                                 Theme.of(context).primaryColor,
-                                            // child: Image.network(
-                                            //   e.url,
-                                            // width: MediaQuery.of(context)
-                                            //     .size
-                                            //     .width,
-                                            // fit: BoxFit.cover,
-                                            // ),
                                             child: CachedNetworkImage(
                                               imageUrl: e.url,
                                               errorWidget:
@@ -212,9 +236,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                        ' ${apiData.likeCount == null ? '0' : idDataLike.length} like'),
+                                        ' ${_likeuser.contains(apiData.id) ? apiData.likeCount + 1 : apiData.likeCount} like'),
                                     Text(
-                                        '${apiData.comments.length < 1 ? '0' : apiData.likeCount} comment')
+                                        '${apiData.comments.length < 1 ? '0' : apiData.comments.length} comment')
                                   ],
                                 ),
                               ),
@@ -224,32 +248,37 @@ class _HomeScreenState extends State<HomeScreen> {
                                 children: [
                                   TextButton.icon(
                                       style: ButtonStyle(
-                                        foregroundColor: !_likes[index]
+                                        foregroundColor: apiData.likesUser
+                                                .map((e) => e.alumni.id)
+                                                .contains(value)
                                             ? MaterialStateProperty.all<Color>(
-                                                Colors.grey)
-                                            : MaterialStateProperty.all<Color>(
                                                 Theme.of(context)
-                                                    .bottomAppBarColor),
+                                                    .bottomAppBarColor)
+                                            : _likeuser.contains(apiData.id)
+                                                ? MaterialStateProperty.all<
+                                                        Color>(
+                                                    Theme.of(context)
+                                                        .bottomAppBarColor)
+                                                : MaterialStateProperty.all<
+                                                    Color>(Colors.grey),
                                       ),
                                       onPressed: () {
-                                        if (idDataLike.isNotEmpty)
-                                          idDataLike.forEach((element) {
-                                            print('d');
-                                            likeDisLike(element);
-                                          });
                                         setState(() {
-                                          _likes[index] = !_likes[index];
+                                          _likeuser.contains(apiData.id)
+                                              ? _likeuser.remove(apiData.id)
+                                              : _likeuser.add(apiData.id);
                                         });
-                                        _likes[index]
-                                            ? idDataLike.add(apiData.id)
-                                            : idDataLike.remove(apiData.id);
-                                        print(idDataLike.length);
 
-                                        // likeDisLike(apiData.id);
+                                        likeDisLike(apiData.id);
                                       },
-                                      icon: !_likes[index]
-                                          ? Icon(Icons.thumb_up_alt_outlined)
-                                          : Icon(Icons.thumb_up),
+                                      icon: apiData.likesUser
+                                              .map((e) => e.alumni.id)
+                                              .contains(value)
+                                          ? Icon(Icons.thumb_up)
+                                          : _likeuser.contains(apiData.id)
+                                              ? Icon(Icons.thumb_up)
+                                              : Icon(
+                                                  Icons.thumb_up_alt_outlined),
                                       label: Text('like')),
                                   TextButton.icon(
                                       style: ButtonStyle(
@@ -260,27 +289,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                       onPressed: () {
                                         if (apiData.mediaUrl.isNotEmpty)
                                           // for (var image in apiData.mediaUrl)
-                                          Navigator.of(context).push(MaterialPageRoute(
-                                              builder: (BuildContext context) =>
-                                                  CommentScreen(
-                                                      apiData.id,
-                                                      apiData.likeCount == null
-                                                          ? '0'
-                                                          : idDataLike.length,
-                                                      apiData.comments.length <
-                                                              1
-                                                          ? '0'
-                                                          : apiData.likeCount,
-                                                      apiData.alumni.mediaUrl ==
-                                                              null
-                                                          ? 'null'
-                                                          : apiData
-                                                              .alumni.mediaUrl,
-                                                      apiData.mediaUrl,
-                                                      '${apiData.alumni.firstName} ${apiData.alumni.lastName}',
-                                                      apiData
-                                                          .alumni.college.name,
-                                                      _likes[index])));
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (BuildContext
+                                                          context) =>
+                                                      CommentScreen(
+                                                          apiData.id,
+                                                          apiData.likeCount,
+                                                          apiData
+                                                              .comments.length,
+                                                          apiData.alumni
+                                                                      .mediaUrl ==
+                                                                  null
+                                                              ? 'null'
+                                                              : apiData.alumni
+                                                                  .mediaUrl,
+                                                          apiData.mediaUrl,
+                                                          '${apiData.alumni.firstName} ${apiData.alumni.lastName}',
+                                                          apiData.alumni.college
+                                                              .name,
+                                                          _likeuser)));
                                       },
                                       icon: Icon(Icons.comment_rounded)),
                                   TextButton.icon(

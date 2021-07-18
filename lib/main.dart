@@ -24,6 +24,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // ChangeNotifierProvider(create: (ctx) => FeedGet()),
         ChangeNotifierProvider(create: (ctx) => HomeDataProvider()),
         ChangeNotifierProvider.value(value: MessageProvider()),
       ],

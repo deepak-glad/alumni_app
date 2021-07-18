@@ -46,6 +46,7 @@ class _EventDetailState extends State<EventDetail> {
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          behavior: SnackBarBehavior.floating,
           duration: Duration(seconds: 5),
           content: Text(succ),
           backgroundColor: Colors.green,
@@ -57,6 +58,7 @@ class _EventDetailState extends State<EventDetail> {
     } else
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          behavior: SnackBarBehavior.floating,
           duration: Duration(seconds: 4),
           content: Text(message),
           backgroundColor: Theme.of(context).errorColor,

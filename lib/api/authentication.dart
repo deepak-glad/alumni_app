@@ -102,7 +102,7 @@ class _AutheState extends State<Authe> {
         'Content-Type': 'application/json; charset=UTF-8',
       });
       var jsonResponse = json.decode(response.body);
-
+      // print(jsonResponse);
       if (response.statusCode == 200 && jsonResponse['status']) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setBool("isLoggedIn", rem);
@@ -117,6 +117,9 @@ class _AutheState extends State<Authe> {
         final value2 = '${jsonResponse['data']['firstName']}'
             ' ${jsonResponse['data']['lastName']}';
         prefs.setString(key2, value2);
+        final key3 = 'id';
+        final value3 = '${jsonResponse['data']['_id']}';
+        prefs.setString(key3, value3);
         return Navigator.of(cc).pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (BuildContext context) => HomePage(),

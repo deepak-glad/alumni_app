@@ -44,6 +44,7 @@ class _AddEventState extends State<AddEvent> {
       var message = 'successfully addded event please refresh it to see';
       ScaffoldMessenger.of(cc).showSnackBar(
         SnackBar(
+          behavior: SnackBarBehavior.floating,
           duration: Duration(seconds: 5),
           content: Text(message),
           backgroundColor: Theme.of(cc).primaryColor,
@@ -56,6 +57,7 @@ class _AddEventState extends State<AddEvent> {
       var message = 'somthing went wrong';
       ScaffoldMessenger.of(cc).showSnackBar(
         SnackBar(
+          behavior: SnackBarBehavior.floating,
           duration: Duration(seconds: 5),
           content: Text(message),
           backgroundColor: Theme.of(cc).errorColor,

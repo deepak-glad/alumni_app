@@ -73,6 +73,7 @@ class _SharePostState extends State<SharePost> {
         var message = 'added successfully';
         ScaffoldMessenger.of(cc).showSnackBar(
           SnackBar(
+            behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 5),
             content: Text(message),
             backgroundColor: Theme.of(cc).primaryColor,
@@ -90,6 +91,7 @@ class _SharePostState extends State<SharePost> {
             user.message != null ? user.message : 'somthing went wrong';
         ScaffoldMessenger.of(cc).showSnackBar(
           SnackBar(
+            behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 5),
             content: Text(message),
             backgroundColor: Theme.of(cc).errorColor,
