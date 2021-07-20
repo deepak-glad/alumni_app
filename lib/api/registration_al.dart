@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'package:test_appp/api/verify_api.dart';
+import 'package:test_appp/screen/verify_register.dart';
+
 import '/api/authentication.dart';
 import '/module/registerErr.dart';
 import '/screen/successfully_registered.dart';
@@ -66,7 +69,8 @@ class _RegistrationAluminiState extends State<RegistrationAlumini> {
       if (response.statusCode == 200 && da['status'] == true) {
         return Navigator.of(cc).pushAndRemoveUntil(
             MaterialPageRoute(
-              builder: (BuildContext context) => SuccessfullyRegistered(),
+              builder: (BuildContext context) =>
+                  VerifyApi(choice: 'alumni', name: email),
             ),
             (Route<dynamic> route) => false);
       } else {

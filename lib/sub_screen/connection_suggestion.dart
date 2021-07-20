@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import '/api/connectionSuggestion_api.dart';
+import 'package:test_appp/api/addFriend_api.dart';
+import 'package:test_appp/module/pendin_model.dart';
+
+import '../api/connection_api.dart';
 import '/module/suggestion.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,199 +17,119 @@ class ConnectionSuggestion extends StatefulWidget {
   _ConnectionSuggestionState createState() => _ConnectionSuggestionState();
 }
 
-class _ConnectionSuggestionState extends State<ConnectionSuggestion> {
+class _ConnectionSuggestionState extends State<ConnectionSuggestion>
+    with AutomaticKeepAliveClientMixin<ConnectionSuggestion> {
   late Future<Welcome> _data;
   bool isLoading = false;
   var add = '';
   @override
   void initState() {
     _data = connectionSuggestion();
+    _pendintFriendRequest();
     super.initState();
   }
 
-  _onpress(String id) async {
-    setState(() {
-      isLoading = true;
-    });
+  var _friendData = [];
+
+  @override
+  bool get wantKeepAlive => true;
+
+  Future<void> _pendintFriendRequest() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var value = prefs.getString('token');
-    var url = Uri.parse(
-        'https://alumni-supervision.herokuapp.com/connect/addFriend/$id');
-    http.Response response = await http.post(url, headers: {
+    var url =
+        Uri.parse('https://alumni-supervision.herokuapp.com/connect/pending');
+    http.Response response = await http.get(url, headers: {
       HttpHeaders.authorizationHeader: value.toString(),
     });
     var jsonResponse = json.decode(response.body);
-    // print(id);
-    // print(response.body);
-    if (response.statusCode == 200 && jsonResponse['status']) {
-      setState(() {
-        add = id;
+    var dataa = Pending.fromJson(jsonResponse);
+    setState(() {
+      dataa.invitationSend.forEach((element) {
+        _friendData.add(element.targetUser);
       });
-      var message = 'successfull';
-      return ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 5),
-          content: Text(message),
-          backgroundColor: Theme.of(context).errorColor,
-        ),
-      );
-    } else {
-      var message = jsonResponse["message"];
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 5),
-          content: Text(message),
-          backgroundColor: Theme.of(context).errorColor,
-        ),
-      );
-      setState(() {
-        isLoading = false;
-      });
-    }
+    });
+  }
+
+  Future _onPull() async {
+    await Future.delayed(Duration(milliseconds: 1000));
+    setState(() {
+      _data = connectionSuggestion();
+      _pendintFriendRequest();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final orientation = MediaQuery.of(context).orientation;
+    super.build(context);
     return Container(
-      // color: Colors.amber,
-      // padding: const EdgeInsets.all(5),
-      margin: const EdgeInsets.only(top: 8, left: 2, right: 4),
+      margin: const EdgeInsets.only(top: 8, left: 2, right: 4, bottom: 5),
       child: FutureBuilder<Welcome>(
           future: _data,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return
-                  //   GridView.builder(
-                  //       physics: NeverScrollableScrollPhysics(),
-                  //       shrinkWrap: true,
-                  //       itemCount: snapshot.data!.data.length,
-                  //       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  //           //  maxCrossAxisExtent: 200,
-                  //           childAspectRatio: 4 / 5,
-                  //           crossAxisSpacing: 8,
-                  //           mainAxisSpacing: 5,
-                  //           crossAxisCount:
-                  //               (orientation == Orientation.portrait) ? 2 : 3),
-                  //       itemBuilder: (context, index) {
-                  //         return Container(
-                  //           decoration: BoxDecoration(
-                  //             color: Colors.white,
-                  //             borderRadius: BorderRadius.circular(20),
-                  //             boxShadow: [BoxShadow(color: Colors.black26)],
-                  //           ),
-                  //           margin: const EdgeInsets.all(8),
-                  //           child: Stack(
-                  //             alignment: AlignmentDirectional.topCenter,
-                  //             children: [
-                  //               Column(
-                  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //                 mainAxisSize: MainAxisSize.min,
-                  //                 children: [
-                  //                   Image.asset(
-                  //                     // snapshot.data!.data[index].mediaUrl == null
-                  //                     // ?
-                  //                     'assets/profile1.jpg',
-                  //                     // : snapshot.data!.data[index].mediaUrl,
-                  //                     height: 80,
-                  //                     width: 180,
-                  //                     fit: BoxFit.fitWidth,
-                  //                   ),
-                  //                   SizedBox(height: 25),
-                  //                   Expanded(
-                  //                     child: Text(
-                  //                       '${snapshot.data!.data[index].firstName} ${snapshot.data!.data[index].lastName}',
-                  //                       textAlign: TextAlign.center,
-                  //                       overflow: TextOverflow.fade,
-                  //                       style: TextStyle(
-                  //                           fontWeight: FontWeight.bold, fontSize: 18),
-                  //                     ),
-                  //                   ),
-                  //                   Text(
-                  //                     snapshot.data!.data[index].college.name,
-                  //                     textAlign: TextAlign.center,
-                  //                   ),
-                  //                   snapshot.data!.data[index].id == add
-                  //                       ? FlatButton.icon(
-                  //                           shape: RoundedRectangleBorder(
-                  //                               side: BorderSide(
-                  //                                   color:
-                  //                                       Theme.of(context).primaryColor),
-                  //                               borderRadius:
-                  //                                   new BorderRadius.circular(28.0)),
-                  //                           minWidth: 150,
-                  //                           height: 30,
-                  //                           color: Theme.of(context).canvasColor,
-                  //                           icon: Icon(Icons.send),
-                  //                           label: Text('Pending',
-                  //                               style: TextStyle(
-                  //                                   color:
-                  //                                       Theme.of(context).primaryColor,
-                  //                                   fontSize: 18)),
-                  //                           onPressed: () {
-                  //                             _onpress(snapshot.data!.data[index].id);
-                  //                           })
-                  //                       :
-                  //                       // ignore: deprecated_member_use
-                  //                       FlatButton(
-                  //                           shape: RoundedRectangleBorder(
-                  //                               borderRadius:
-                  //                                   new BorderRadius.circular(28.0)),
-                  //                           minWidth: 150,
-                  //                           height: 30,
-                  //                           color: Theme.of(context).primaryColor,
-                  //                           child: Text('Connect',
-                  //                               style: TextStyle(
-                  //                                   color: Colors.white, fontSize: 18)),
-                  //                           onPressed: () {
-                  //                             _onpress(snapshot.data!.data[index].id);
-                  //                           })
-                  //                 ],
-                  //               ),
-                  //               Container(
-                  //                 height: 85,
-                  //                 width: 80,
-                  //                 margin: const EdgeInsets.only(top: 25),
-                  //                 child: CircleAvatar(
-                  //                   // foregroundImage:
-                  //                   //     NetworkImage(snapshot.data.data[index].mediaUrl),
-                  //                   radius: 60.0,
-                  //                 ),
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         );
-                  //       });
-                  // }
-                  ListView.builder(
-                      itemCount: snapshot.data!.data.length,
-                      itemBuilder: (context, index) {
-                        var _apidata = snapshot.data!.data[index];
-                        return Column(children: [
-                          Card(
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundImage:
-                                    AssetImage('assets/profile1.jpg'),
-                                radius: 26,
+              return RefreshIndicator(
+                onRefresh: _onPull,
+                child: ListView.builder(
+                    itemCount: snapshot.data!.data.length,
+                    itemBuilder: (context, index) {
+                      var _apidata = snapshot.data!.data[index];
+                      return Column(children: [
+                        Card(
+                          child: ListTile(
+                            isThreeLine: true,
+                            leading: CircleAvatar(
+                              backgroundImage:
+                                  AssetImage('assets/profile1.jpg'),
+                              radius: 26,
+                            ),
+                            title: Text(
+                                '${_apidata.firstName} ${_apidata.lastName}'),
+                            subtitle: Text(_apidata.college.name),
+                            trailing: TextButton(
+                              child: Image.asset(
+                                'assets/icon.png',
+                                height: 25,
+                                color: _friendData
+                                        .contains(snapshot.data!.data[index].id)
+                                    ? Colors.grey
+                                    : Colors.blue,
                               ),
-                              title: Text(
-                                  '${_apidata.firstName} ${_apidata.lastName}'),
-                              subtitle: Text(_apidata.college.name),
-                              trailing: TextButton(
-                                child: Image.asset(
-                                  'assets/icon.png',
-                                  height: 25,
-                                ),
-                                onPressed: () {},
-                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _friendData.contains(
+                                          snapshot.data!.data[index].id)
+                                      ? _friendData
+                                          .remove(snapshot.data!.data[index].id)
+                                      : _friendData
+                                          .add(snapshot.data!.data[index].id);
+                                });
+                                var message = _friendData
+                                        .contains(snapshot.data!.data[index].id)
+                                    ? 'friend request send'
+                                    : 'friend request withdraw';
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    behavior: SnackBarBehavior.floating,
+                                    duration: Duration(seconds: 2),
+                                    content: Text(message),
+                                    backgroundColor:
+                                        Theme.of(context).primaryColor,
+                                    action: SnackBarAction(
+                                      label: 'X',
+                                      onPressed: () {},
+                                    ),
+                                  ),
+                                );
+                                onpress(snapshot.data!.data[index].id, context);
+                              },
                             ),
                           ),
-                          Divider()
-                        ]);
-                      });
+                        ),
+                        Divider()
+                      ]);
+                    }),
+              );
             }
             return Center(
               child: CircularProgressIndicator(),

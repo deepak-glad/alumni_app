@@ -287,28 +287,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   Colors.grey)),
                                       label: Text('comment'),
                                       onPressed: () {
-                                        if (apiData.mediaUrl.isNotEmpty)
-                                          // for (var image in apiData.mediaUrl)
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (BuildContext
-                                                          context) =>
-                                                      CommentScreen(
-                                                          apiData.id,
-                                                          apiData.likeCount,
-                                                          apiData
-                                                              .comments.length,
-                                                          apiData.alumni
-                                                                      .mediaUrl ==
-                                                                  null
-                                                              ? 'null'
-                                                              : apiData.alumni
-                                                                  .mediaUrl,
-                                                          apiData.mediaUrl,
-                                                          '${apiData.alumni.firstName} ${apiData.alumni.lastName}',
-                                                          apiData.alumni.college
-                                                              .name,
-                                                          _likeuser)));
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (BuildContext
+                                                        context) =>
+                                                    CommentScreen(
+                                                        apiData.id,
+                                                        apiData.likeCount,
+                                                        apiData.comments.length,
+                                                        apiData.alumni
+                                                                    .mediaUrl ==
+                                                                null
+                                                            ? 'null'
+                                                            : apiData.alumni
+                                                                .mediaUrl,
+                                                        apiData.mediaUrl,
+                                                        '${apiData.alumni.firstName} ${apiData.alumni.lastName}',
+                                                        apiData.alumni.college
+                                                            .name,
+                                                        apiData.discription,
+                                                        _likeuser)));
                                       },
                                       icon: Icon(Icons.comment_rounded)),
                                   TextButton.icon(

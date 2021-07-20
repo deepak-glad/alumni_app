@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:test_appp/api/verify_api.dart';
+
 import '/module/registerErr.dart';
 import '/screen/otp_verification.dart';
 import '/screen/register_student.dart';
@@ -39,12 +41,13 @@ class _RegistrationStudentState extends State<RegistrationStudent> {
             "Content-Type": "application/json"
           });
       var da = json.decode(response.body);
-      // print(response.body);
+      print(response.body);
       Map<String, dynamic> userMap = jsonDecode(response.body);
       if (response.statusCode == 200 && da['status'] == true) {
         return Navigator.of(cc).pushAndRemoveUntil(
             MaterialPageRoute(
-              builder: (BuildContext context) => SuccessfullyRegistered(),
+              builder: (BuildContext context) =>
+                  VerifyApi(name: email, choice: 'user'),
             ),
             (Route<dynamic> route) => false);
       } else {

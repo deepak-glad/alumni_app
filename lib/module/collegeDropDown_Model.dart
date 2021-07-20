@@ -2,7 +2,6 @@
 //
 //     final welcome = welcomeFromJson(jsonString);
 
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 Welcome welcomeFromJson(String str) => Welcome.fromJson(json.decode(str));
@@ -34,7 +33,7 @@ class Datum {
     required this.id,
     required this.name,
     required this.collegeCode,
-    // required this.city,
+    required this.city,
     required this.status,
     required this.createdAt,
     required this.updatedAt,
@@ -43,7 +42,7 @@ class Datum {
   String id;
   String name;
   String collegeCode;
-  // City city;
+  City city;
   bool status;
   DateTime createdAt;
   DateTime updatedAt;
@@ -52,7 +51,7 @@ class Datum {
         id: json["_id"],
         name: json["name"],
         collegeCode: json["collegeCode"],
-        // city: City.fromJson(json["city"]),
+        city: City.fromJson(json["city"]),
         status: json["status"],
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
@@ -62,7 +61,7 @@ class Datum {
         "_id": id,
         "name": name,
         "collegeCode": collegeCode,
-        // "city": city.toJson(),
+        "city": city.toJson(),
         "status": status,
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),

@@ -18,11 +18,19 @@ class CommentScreen extends StatefulWidget {
   final List image;
   final String name;
   final String batchYear;
-  // bool isLiked;
+  final String description;
   final List liked;
 
-  CommentScreen(this.postId, this.likecount, this.commentcount,
-      this.profileImage, this.image, this.name, this.batchYear, this.liked);
+  CommentScreen(
+      this.postId,
+      this.likecount,
+      this.commentcount,
+      this.profileImage,
+      this.image,
+      this.name,
+      this.batchYear,
+      this.description,
+      this.liked);
 
   @override
   _CommentScreenState createState() => _CommentScreenState();
@@ -39,9 +47,13 @@ class _CommentScreenState extends State<CommentScreen> {
   }
 
   late Future<Comment> _future;
+  var _id;
   void initState() {
-    setState(() {
-      _future = commentgetdata(widget.postId);
+    _future = commentgetdata(widget.postId);
+    _future.then((value) {
+      setState(() {
+        _id = value.data.id;
+      });
     });
     super.initState();
   }
@@ -98,34 +110,45 @@ class _CommentScreenState extends State<CommentScreen> {
                           icon: Icon(Icons.arrow_drop_down),
                         ),
                       ),
-                      // Text(widget.description, overflow: TextOverflow.visible),
-                      CarouselSlider(
-                        items: widget.image
-                            .map((e) => Container(
-                                  color: Theme.of(context).primaryColor,
-                                  child: CachedNetworkImage(
-                                    imageUrl: e.url,
-                                    errorWidget: (context, url, error) =>
-                                        Icon(Icons.broken_image),
-                                    width: MediaQuery.of(context).size.width,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ))
-                            .toList(),
-                        carouselController: buttonCarouselController,
-                        options: CarouselOptions(
-                            // height: 300,
-                            autoPlay: false,
-                            viewportFraction: 1.0,
-                            enlargeCenterPage: true,
-                            enableInfiniteScroll: false,
-                            aspectRatio: 1.0,
-                            onPageChanged: (index, reason) {
-                              setState(() {
-                                _current = index;
-                              });
-                            }),
+                      Container(
+                        alignment: Alignment.topLeft,
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          widget.description,
+                          // maxLines: _descmore ? 10 : 2,
+                          overflow: TextOverflow.visible,
+                        ),
                       ),
+                      if (widget.image.isNotEmpty)
+                        CarouselSlider(
+                          items: widget.image
+                              .map((e) => Container(
+                                    color: Theme.of(context).primaryColor,
+                                    child: CachedNetworkImage(
+                                      imageUrl: e.url,
+                                      errorWidget: (context, url, error) =>
+                                          Icon(Icons.broken_image),
+                                      width: MediaQuery.of(context).size.width,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ))
+                              .toList(),
+                          carouselController: buttonCarouselController,
+                          options: CarouselOptions(
+                              // height: 300,
+                              autoPlay: false,
+                              viewportFraction: 1.0,
+                              enlargeCenterPage: true,
+                              enableInfiniteScroll: false,
+                              aspectRatio: 1.0,
+                              onPageChanged: (index, reason) {
+                                setState(() {
+                                  _current = index;
+                                });
+                              }),
+                        ),
+                      // if(widget.description != null)
+
                       if (widget.image.length > 1)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -150,6 +173,61 @@ class _CommentScreenState extends State<CommentScreen> {
                             );
                           }).toList(),
                         ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                                ' ${widget.liked.contains(_id) ? widget.likecount + 1 : widget.likecount} like'),
+                            Text(
+                                '${widget.commentcount < 1 ? '0' : widget.commentcount} comment')
+                          ],
+                        ),
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          TextButton.icon(
+                              style: ButtonStyle(
+                                foregroundColor: widget.liked.contains(_id)
+                                    ? MaterialStateProperty.all<Color>(
+                                        Theme.of(context).bottomAppBarColor)
+                                    : MaterialStateProperty.all<Color>(
+                                        Colors.grey),
+                              ),
+                              onPressed: () {
+                                likeDisLike(_id);
+                                setState(() {
+                                  widget.liked.contains(_id)
+                                      ? widget.liked.remove(_id)
+                                      : widget.liked.add(_id);
+                                });
+                              },
+                              icon: Icon(widget.liked.contains(_id)
+                                  ? Icons.thumb_up
+                                  : Icons.thumb_up_alt_outlined),
+                              label: Text('like')),
+                          TextButton.icon(
+                              style: ButtonStyle(
+                                  foregroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.grey)),
+                              label: Text('comment'),
+                              onPressed: () {},
+                              icon: Icon(Icons.comment_rounded)),
+                          TextButton.icon(
+                              style: ButtonStyle(
+                                  foregroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.grey)),
+                              onPressed: () {},
+                              icon: Icon(Icons.send_and_archive),
+                              label: Text('share')),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -167,247 +245,142 @@ class _CommentScreenState extends State<CommentScreen> {
 
                                 return Container(
                                     width: MediaQuery.of(context).size.width,
-                                    child: Column(children: [
-                                      if (index == 0)
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            // Padding(
-                                            //   padding:
-                                            //       const EdgeInsets.symmetric(
-                                            //           horizontal: 8.0,
-                                            //           vertical: 5),
-                                            //   child: Row(
-                                            //     mainAxisAlignment:
-                                            //         MainAxisAlignment
-                                            //             .spaceBetween,
-                                            //     children: [
-                                            //       Text(
-                                            //           ' ${widget.likecount} like'),
-                                            //       Text(
-                                            //           '${widget.commentcount} comment')
-                                            //     ],
-                                            //   ),
-                                            // ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 8.0,
-                                                      vertical: 5),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                      ' ${widget.liked.contains(dta.id) ? dta.likeCount + 1 : dta.likeCount} like'),
-                                                  Text(
-                                                      '${dta.comments.length < 1 ? '0' : dta.comments.length} comment')
-                                                ],
-                                              ),
+                                    child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 8.0, top: 10, bottom: 5),
+                                            child: Text(
+                                              'Reactions',
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w500),
                                             ),
-                                            Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceAround,
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 9),
+                                            height: 40,
+                                            child: ListView(
+                                              shrinkWrap: true,
+                                              scrollDirection: Axis.horizontal,
                                               children: [
-                                                TextButton.icon(
-                                                    style: ButtonStyle(
-                                                      foregroundColor: widget
-                                                              .liked
-                                                              .contains(dta.id)
-                                                          ? MaterialStateProperty.all<
-                                                              Color>(Theme.of(
-                                                                  context)
-                                                              .bottomAppBarColor)
-                                                          : MaterialStateProperty
-                                                              .all<Color>(
-                                                                  Colors.grey),
-                                                    ),
-                                                    onPressed: () {
-                                                      likeDisLike(dta.id);
-                                                      setState(() {
-                                                        widget.liked.contains(
-                                                                dta.id)
-                                                            ? widget.liked
-                                                                .remove(dta.id)
-                                                            : widget.liked
-                                                                .add(dta.id);
-                                                      });
-                                                    },
-                                                    icon: Icon(widget.liked
-                                                            .contains(dta.id)
-                                                        ? Icons.thumb_up
-                                                        : Icons
-                                                            .thumb_up_alt_outlined),
-                                                    label: Text('like')),
-                                                TextButton.icon(
-                                                    style: ButtonStyle(
-                                                        foregroundColor:
-                                                            MaterialStateProperty
-                                                                .all<Color>(
-                                                                    Colors
-                                                                        .grey)),
-                                                    label: Text('comment'),
-                                                    onPressed: () {},
-                                                    icon: Icon(
-                                                        Icons.comment_rounded)),
-                                                TextButton.icon(
-                                                    style: ButtonStyle(
-                                                        foregroundColor:
-                                                            MaterialStateProperty
-                                                                .all<Color>(
-                                                                    Colors
-                                                                        .grey)),
-                                                    onPressed: () {},
-                                                    icon: Icon(
-                                                        Icons.send_and_archive),
-                                                    label: Text('share')),
+                                                Stack(
+                                                    alignment:
+                                                        AlignmentDirectional
+                                                            .bottomEnd,
+                                                    children: [
+                                                      CircleAvatar(),
+                                                      Icon(
+                                                        Icons.thumb_up,
+                                                        color: Theme.of(context)
+                                                            .primaryColor,
+                                                        size: 17,
+                                                      )
+                                                    ]),
+                                                SizedBox(width: 5),
+                                                Stack(
+                                                    alignment:
+                                                        AlignmentDirectional
+                                                            .bottomEnd,
+                                                    children: [
+                                                      CircleAvatar(),
+                                                      Icon(
+                                                        Icons.thumb_up,
+                                                        color: Theme.of(context)
+                                                            .primaryColor,
+                                                        size: 17,
+                                                      )
+                                                    ]),
                                               ],
                                             ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 8.0,
-                                                  top: 10,
-                                                  bottom: 5),
-                                              child: Text(
-                                                'Reactions',
-                                                style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 8.0, top: 10, bottom: 5),
+                                            child: Text(
+                                              'Comments',
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w500),
                                             ),
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 9),
-                                              height: 40,
-                                              child: ListView(
-                                                shrinkWrap: true,
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                children: [
-                                                  Stack(
-                                                      alignment:
-                                                          AlignmentDirectional
-                                                              .bottomEnd,
-                                                      children: [
-                                                        CircleAvatar(),
-                                                        Icon(
-                                                          Icons.thumb_up,
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .primaryColor,
-                                                          size: 17,
-                                                        )
-                                                      ]),
-                                                  SizedBox(width: 5),
-                                                  Stack(
-                                                      alignment:
-                                                          AlignmentDirectional
-                                                              .bottomEnd,
-                                                      children: [
-                                                        CircleAvatar(),
-                                                        Icon(
-                                                          Icons.thumb_up,
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .primaryColor,
-                                                          size: 17,
-                                                        )
-                                                      ]),
-                                                ],
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 8.0,
-                                                  top: 10,
-                                                  bottom: 5),
-                                              child: Text(
-                                                'Comments',
-                                                style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                                margin: const EdgeInsets.only(
-                                                    top: 10),
-                                                width: 60,
-                                                child: CircleAvatar()),
-                                            Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  CommentStructure(
-                                                      dta.comments[index].alumni
-                                                          .firstName,
-                                                      dta.comments[index].alumni
-                                                          .lastName,
-                                                      snapshot
-                                                          .data!
-                                                          .data
-                                                          .comments[index]
-                                                          .alumni
-                                                          .college
-                                                          .name,
-                                                      dta.comments[index]
-                                                          .comment),
-                                                  TextButton(
-                                                      onPressed: () {
-                                                        Navigator.of(context).push(MaterialPageRoute(
-                                                            builder: (BuildContext context) => ReplyComment(
-                                                                dta
-                                                                    .comments[
-                                                                        index]
-                                                                    .id,
-                                                                dta
-                                                                    .comments[
-                                                                        index]
-                                                                    .alumni
-                                                                    .firstName,
-                                                                dta
-                                                                    .comments[
-                                                                        index]
-                                                                    .alumni
-                                                                    .lastName,
-                                                                snapshot
-                                                                    .data!
-                                                                    .data
-                                                                    .comments[
-                                                                        index]
-                                                                    .alumni
-                                                                    .college
-                                                                    .name,
-                                                                dta
-                                                                    .comments[
-                                                                        index]
-                                                                    .comment,
-                                                                widget
-                                                                    .profileImage)));
-                                                      },
-                                                      child: Text('Reply')),
-                                                  if (dta.comments[index]
-                                                      .replies.isNotEmpty)
-                                                    Column(
-                                                        children: dta
-                                                            .comments[index]
-                                                            .replies
-                                                            .map<Widget>((e) =>
-                                                                REplyComment(
+                                          ),
+                                          Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                            top: 10),
+                                                    width: 60,
+                                                    child: CircleAvatar()),
+                                                Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      CommentStructure(
+                                                          dta.comments[index]
+                                                              .alumni.firstName,
+                                                          dta.comments[index]
+                                                              .alumni.lastName,
+                                                          snapshot
+                                                              .data!
+                                                              .data
+                                                              .comments[index]
+                                                              .alumni
+                                                              .college
+                                                              .name,
+                                                          dta.comments[index]
+                                                              .comment),
+                                                      TextButton(
+                                                          onPressed: () {
+                                                            Navigator.of(context).push(MaterialPageRoute(
+                                                                builder: (BuildContext context) => ReplyComment(
+                                                                    dta
+                                                                        .comments[
+                                                                            index]
+                                                                        .id,
+                                                                    dta
+                                                                        .comments[
+                                                                            index]
+                                                                        .alumni
+                                                                        .firstName,
+                                                                    dta
+                                                                        .comments[
+                                                                            index]
+                                                                        .alumni
+                                                                        .lastName,
+                                                                    snapshot
+                                                                        .data!
+                                                                        .data
+                                                                        .comments[
+                                                                            index]
+                                                                        .alumni
+                                                                        .college
+                                                                        .name,
+                                                                    dta
+                                                                        .comments[
+                                                                            index]
+                                                                        .comment,
+                                                                    widget
+                                                                        .profileImage)));
+                                                          },
+                                                          child: Text('Reply')),
+                                                      if (dta.comments[index]
+                                                          .replies.isNotEmpty)
+                                                        Column(
+                                                            children: dta
+                                                                .comments[index]
+                                                                .replies
+                                                                .map<Widget>((e) => REplyComment(
                                                                     e.alumni
                                                                         .firstName,
                                                                     e.alumni
@@ -417,19 +390,21 @@ class _CommentScreenState extends State<CommentScreen> {
                                                                         .college
                                                                         .name,
                                                                     e.reply))
-                                                            .toList()),
-                                                  Divider(
-                                                      height: 10,
-                                                      color: Colors.black,
-                                                      thickness: 5),
-                                                ]),
-                                          ]),
-                                    ]));
+                                                                .toList()),
+                                                      Divider(
+                                                          height: 10,
+                                                          color: Colors.black,
+                                                          thickness: 5),
+                                                    ]),
+                                              ]),
+                                        ]));
                               });
                         }
-                        return Text('Be the first to comment');
+                        return Center(child: Text('Be the first to comment'));
                       } else if (snapshot.hasError) {
-                        return Text('something went wrong try again later');
+                        return Center(
+                            child:
+                                Text('something went wrong try again later'));
                       }
                       return Center(
                         child: CircularProgressIndicator(),

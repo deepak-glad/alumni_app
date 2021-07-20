@@ -1,7 +1,8 @@
-// To parse required  this JSON data, do
+// To parse this JSON data, do
 //
 //     final welcome = welcomeFromJson(jsonString);
 
+import 'package:meta/meta.dart';
 import 'dart:convert';
 
 Welcome welcomeFromJson(String str) => Welcome.fromJson(json.decode(str));

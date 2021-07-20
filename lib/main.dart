@@ -1,8 +1,9 @@
+import 'package:test_appp/screen/successfully_registered.dart';
+
 import '/api/registration_al.dart';
 import '/module/home_data.dart';
 import '/module/message_module.dart';
 import '/screen/calender.dart';
-import '/screen/friendsList.dart';
 import '/screen/jobs.dart';
 import '/screen/notification.dart';
 import '/screen/requestFriendList.dart';
@@ -52,7 +53,6 @@ class MyApp extends StatelessWidget {
           ForgetPasswordApi.routename: (ctx) => ForgetPasswordApi(),
           JobsScreen.routeName: (ctx) => JobsScreen(),
           SettingScreen.routeName: (ctx) => SettingScreen(),
-          FriendsList.routeName: (ctx) => FriendsList(),
           RequestFriendList.routeName: (ctx) => RequestFriendList(),
           // SuccessfullyRegistered.routeName: (ctx) => SuccessfullyRegistered()
           // AddEvent.routeName: (ctx) => AddEvent(),
