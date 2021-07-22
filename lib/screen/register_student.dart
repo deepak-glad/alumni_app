@@ -30,7 +30,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
     final isValid = _formKey.currentState!.validate();
     FocusScope.of(context).unfocus();
 
-    if (isValid) {
+    if (isValid && _collegeId != null) {
       _formKey.currentState!.save();
       widget.submitFn(
         _name.trim(),
@@ -106,6 +106,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                   padding: const EdgeInsets.all(12.0),
                                 ),
                                 TextFormField(
+                                  textCapitalization: TextCapitalization.words,
                                   key: ValueKey('first Name'),
                                   validator: (value) {
                                     if (value!.isEmpty || value.length < 4) {
@@ -119,7 +120,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                   keyboardType: TextInputType.emailAddress,
                                   decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.person),
-                                      labelText: 'first name',
+                                      labelText: 'Enter your first name',
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(40)))),
@@ -128,6 +129,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                   padding: const EdgeInsets.all(12.0),
                                 ),
                                 TextFormField(
+                                  textCapitalization: TextCapitalization.words,
                                   key: ValueKey('lastName'),
                                   validator: (value) {
                                     if (value!.isEmpty || value.length < 4) {
@@ -141,7 +143,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                   keyboardType: TextInputType.emailAddress,
                                   decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.person),
-                                      labelText: 'Last Name',
+                                      labelText: 'Enter your last Name',
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(40)))),
@@ -160,11 +162,11 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                   onSaved: (value) {
                                     _rollNumber = value!;
                                   },
-                                  keyboardType: TextInputType.emailAddress,
+                                  keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
                                       prefixIcon:
                                           Icon(Icons.confirmation_number),
-                                      labelText: 'Roll Number',
+                                      labelText: 'Enter your roll Number',
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(40)))),
@@ -177,7 +179,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                   padding: const EdgeInsets.all(12.0),
                                 ),
                                 TextFormField(
-                                  key: ValueKey('username'),
+                                  key: ValueKey('email'),
                                   validator: (value) {
                                     if (value!.isEmpty || value.length < 4) {
                                       return 'Please enter atleast 4 characters ';
@@ -190,7 +192,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                   keyboardType: TextInputType.emailAddress,
                                   decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.email),
-                                      labelText: 'email',
+                                      labelText: 'Enter your email',
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(40)))),
@@ -205,13 +207,14 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                     _password = value!;
                                   },
                                   validator: (val) {
-                                    if (val!.isEmpty) return 'Empty';
+                                    if (val!.isEmpty)
+                                      return 'please enter password!';
                                     return null;
                                   },
                                   keyboardType: TextInputType.emailAddress,
                                   decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.lock),
-                                      labelText: 'Enter password',
+                                      labelText: 'Enter your password',
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(40)))),
@@ -226,15 +229,17 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                     _password = value!;
                                   },
                                   validator: (val) {
-                                    if (val!.isEmpty) return 'Empty';
-                                    if (val != _pass.text) return 'not match';
+                                    if (val!.isEmpty)
+                                      return 'Please enter password!';
+                                    if (val != _pass.text)
+                                      return 'password not match';
                                     return null;
                                   },
                                   keyboardType: TextInputType.emailAddress,
                                   obscureText: true,
                                   decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.lock),
-                                      labelText: 'confirm your password',
+                                      labelText: 'Enter your confirm password',
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(40)))),
@@ -247,10 +252,18 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                   onSaved: (value) {
                                     _phoneNo = value!;
                                   },
+                                  validator: (val) {
+                                    if (val!.isEmpty)
+                                      return 'please enter number';
+                                    if (val.length > 9)
+                                      return 'please enter correct number';
+                                    return null;
+                                  },
                                   keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
+                                      prefix: Text('+91'),
                                       prefixIcon: Icon(Icons.phone),
-                                      labelText: 'enter your phone number',
+                                      labelText: 'enter your number',
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(40)))),

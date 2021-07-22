@@ -1,16 +1,16 @@
 // To parse this JSON data, do
 //
-//     final welcome = welcomeFromJson(jsonString);
+//     final FriendModel = FriendFromJson(jsonString);
 
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
-Welcome welcomeFromJson(String str) => Welcome.fromJson(json.decode(str));
+FriendModel friendFromJson(String str) =>
+    FriendModel.fromJson(json.decode(str));
 
-String welcomeToJson(Welcome data) => json.encode(data.toJson());
+String friendToJson(FriendModel data) => json.encode(data.toJson());
 
-class Welcome {
-  Welcome({
+class FriendModel {
+  FriendModel({
     required this.status,
     required this.data,
   });
@@ -18,7 +18,7 @@ class Welcome {
   bool status;
   List<Datum> data;
 
-  factory Welcome.fromJson(Map<String, dynamic> json) => Welcome(
+  factory FriendModel.fromJson(Map<String, dynamic> json) => FriendModel(
         status: json["status"],
         data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
       );

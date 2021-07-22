@@ -2,10 +2,7 @@ import 'dart:convert';
 import 'package:test_appp/api/verify_api.dart';
 
 import '/module/registerErr.dart';
-import '/screen/otp_verification.dart';
 import '/screen/register_student.dart';
-import '/screen/successPassword.dart';
-import '/screen/successfully_registered.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 

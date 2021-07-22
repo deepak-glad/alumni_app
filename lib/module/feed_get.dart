@@ -1,4 +1,3 @@
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 Feeds feedsFromJson(String str) => Feeds.fromJson(json.decode(str));

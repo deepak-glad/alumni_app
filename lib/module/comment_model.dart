@@ -2,7 +2,6 @@
 //
 //     final comment = commentFromJson(jsonString);
 
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 class Comment {

@@ -1,4 +1,4 @@
-import 'package:test_appp/screen/successfully_registered.dart';
+import 'package:test_appp/screen/myfriends_profile_full.dart';
 
 import '/api/registration_al.dart';
 import '/module/home_data.dart';
@@ -25,7 +25,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // ChangeNotifierProvider(create: (ctx) => FeedGet()),
         ChangeNotifierProvider(create: (ctx) => HomeDataProvider()),
         ChangeNotifierProvider.value(value: MessageProvider()),
       ],
@@ -54,8 +53,7 @@ class MyApp extends StatelessWidget {
           JobsScreen.routeName: (ctx) => JobsScreen(),
           SettingScreen.routeName: (ctx) => SettingScreen(),
           RequestFriendList.routeName: (ctx) => RequestFriendList(),
-          // SuccessfullyRegistered.routeName: (ctx) => SuccessfullyRegistered()
-          // AddEvent.routeName: (ctx) => AddEvent(),
+          MyFriendsProfile.routename: (ctx) => MyFriendsProfile(),
         },
       ),
     );

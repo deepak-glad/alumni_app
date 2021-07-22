@@ -5,14 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SuccessfullyRegistered extends StatelessWidget {
-  // static const routeName = 'Successfully_Registered';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   elevation: 0,
-      // ),
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
@@ -53,6 +48,7 @@ class SuccessfullyRegistered extends StatelessWidget {
                   Container(
                     width: MediaQuery.of(context).size.width / 2,
                     padding: const EdgeInsets.all(8.0),
+                    // ignore: deprecated_member_use
                     child: FlatButton(
                         height: 40,
                         minWidth: MediaQuery.of(context).size.width,
@@ -76,19 +72,6 @@ class SuccessfullyRegistered extends StatelessWidget {
                 ],
               ),
             ),
-            // Icon(Icons.done, size: 200),
-            // Image.asset('assets/success.gif'),
-            // Container(
-            //     child: Text(
-            //   'You have successfully registered with us',
-            //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-            // )),
-            // Container(
-            //   padding: const EdgeInsets.all(8),
-            //   child: Text('Please login for more'),
-            // ),
-            // SizedBox(height: 50),
-            // ignore: deprecated_member_use
           ],
         ),
       ),

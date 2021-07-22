@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_appp/module/comment_model.dart';
-import 'package:test_appp/module/comment_model.dart';
-import 'package:test_appp/module/comment_model.dart';
 
 Future<void> commentData(String postId, String message) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();

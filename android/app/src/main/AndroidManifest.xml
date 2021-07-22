@@ -3,7 +3,7 @@
   package="com.example.test_appp"
 >
     <uses-permission android:name="android.permission.INTERNET" />
-   <application android:label="test_appp" android:icon="@mipmap/ic_launcher">
+   <application android:label="Alumni" android:icon="@mipmap/ic_launcher">
         <activity
       android:name=".MainActivity"
       android:launchMode="singleTop"

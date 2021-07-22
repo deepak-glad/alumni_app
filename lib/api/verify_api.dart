@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:test_appp/screen/successfully_registered.dart';
 import 'package:test_appp/screen/verify_register.dart';
 import 'dart:convert';
-
-import '/screen/otp_verification.dart';
-import '/screen/successPassword.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class VerifyApi extends StatefulWidget {

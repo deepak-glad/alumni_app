@@ -22,9 +22,12 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsScreenState extends State<EventsScreen> {
-  var array = [];
+  late List<Datum> array = <Datum>[];
   var _calendarFormat = CalendarFormat.month;
-  DateTime _focusedDay = DateTime.now();
+  DateTime _focusedDay = DateTime.utc(
+      DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  // DateTime date = DateTime.utc(
+  //     DateTime.now().year, DateTime.now().month, DateTime.now().day);
   late DateTime _selectedDay;
   late Map<DateTime, List<dynamic>> _events;
 
@@ -77,11 +80,22 @@ class _EventsScreenState extends State<EventsScreen> {
 
   Future _onPull() async {
     await Future.delayed(Duration(milliseconds: 1000));
-    array = [];
-
     setState(() {
       _future = eventApi();
+      array = [];
     });
+  }
+
+  @override
+  void setState(VoidCallback fn) {
+    _future.then((value) {
+      for (var e in value.data) {
+        if (e.date == _focusedDay) {
+          array.add(e);
+        }
+      }
+    });
+    super.setState(fn);
   }
 
   @override
@@ -160,7 +174,7 @@ class _EventsScreenState extends State<EventsScreen> {
                 eventLoader: _getEventsForDay,
                 onPageChanged: (focusedDay) {
                   _focusedDay = focusedDay;
-                  // array = [];
+                  array = [];
                 },
                 pageJumpingEnabled: true,
                 firstDay: DateTime(2000),
@@ -186,11 +200,11 @@ class _EventsScreenState extends State<EventsScreen> {
                   future: _future,
                   builder: (context, snashot) {
                     if (snashot.hasData) {
-                      for (var e in snashot.data!.data) {
-                        if (e.date == _focusedDay) {
-                          array.add(e);
-                        }
-                      }
+                      // for (var e in snashot.data!.data) {
+                      //   if (e.date == _focusedDay) {
+                      //     array.add(e);
+                      //   }
+                      // }
                       if (array.isNotEmpty) {
                         return ListView.builder(
                             shrinkWrap: true,

@@ -56,7 +56,7 @@ class _RegisterAluminiState extends State<RegisterAlumini> {
     final isValid = _formKey.currentState!.validate();
     FocusScope.of(context).unfocus();
 
-    if (isValid) {
+    if (isValid && _collegeId != null) {
       _formKey.currentState!.save();
       print(_collegeId);
       widget.submitFn(
@@ -138,10 +138,11 @@ class _RegisterAluminiState extends State<RegisterAlumini> {
                                   padding: const EdgeInsets.all(12.0),
                                 ),
                                 TextFormField(
+                                  textCapitalization: TextCapitalization.words,
                                   key: ValueKey('first Name'),
                                   validator: (value) {
-                                    if (value!.isEmpty || value.length < 4) {
-                                      return 'Please enter atleast 4 characters ';
+                                    if (value!.isEmpty) {
+                                      return 'Please enter first name ';
                                     }
                                     return null;
                                   },
@@ -151,7 +152,7 @@ class _RegisterAluminiState extends State<RegisterAlumini> {
                                   keyboardType: TextInputType.emailAddress,
                                   decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.person),
-                                      labelText: 'first name',
+                                      labelText: 'Please enter your first name',
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(40)))),
@@ -160,10 +161,11 @@ class _RegisterAluminiState extends State<RegisterAlumini> {
                                   padding: const EdgeInsets.all(12.0),
                                 ),
                                 TextFormField(
+                                  textCapitalization: TextCapitalization.words,
                                   key: ValueKey('lastName'),
                                   validator: (value) {
-                                    if (value!.isEmpty || value.length < 4) {
-                                      return 'Please enter atleast 4 characters ';
+                                    if (value!.isEmpty) {
+                                      return 'Please enter last name ';
                                     }
                                     return null;
                                   },
@@ -173,7 +175,7 @@ class _RegisterAluminiState extends State<RegisterAlumini> {
                                   keyboardType: TextInputType.emailAddress,
                                   decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.person),
-                                      labelText: 'Last Name',
+                                      labelText: 'Please enter your last Name',
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(40)))),
@@ -184,19 +186,20 @@ class _RegisterAluminiState extends State<RegisterAlumini> {
                                 TextFormField(
                                   key: ValueKey('roll_number'),
                                   validator: (value) {
-                                    if (value!.isEmpty || value.length < 4) {
-                                      return 'Please enter atleast 4 characters ';
+                                    if (value!.isEmpty && value.length < 9) {
+                                      return 'Please enter valid roll number ';
                                     }
                                     return null;
                                   },
                                   onSaved: (value) {
                                     _rollNumber = value!;
                                   },
-                                  keyboardType: TextInputType.emailAddress,
+                                  keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
                                       prefixIcon:
                                           Icon(Icons.confirmation_number),
-                                      labelText: 'Roll Number',
+                                      labelText:
+                                          'Please enter your roll Number',
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(40)))),
@@ -209,10 +212,10 @@ class _RegisterAluminiState extends State<RegisterAlumini> {
                                   padding: const EdgeInsets.all(12.0),
                                 ),
                                 TextFormField(
-                                  key: ValueKey('username'),
+                                  key: ValueKey('email'),
                                   validator: (value) {
                                     if (value!.isEmpty || value.length < 4) {
-                                      return 'Please enter atleast 4 characters ';
+                                      return 'please enter valid mail';
                                     }
                                     return null;
                                   },
@@ -222,7 +225,7 @@ class _RegisterAluminiState extends State<RegisterAlumini> {
                                   keyboardType: TextInputType.emailAddress,
                                   decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.email),
-                                      labelText: 'email',
+                                      labelText: 'Please enter your email',
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(40)))),
@@ -237,13 +240,14 @@ class _RegisterAluminiState extends State<RegisterAlumini> {
                                     _password = value!;
                                   },
                                   validator: (val) {
-                                    if (val!.isEmpty) return 'empty';
+                                    if (val!.isEmpty)
+                                      return 'please enter your password';
                                     return null;
                                   },
                                   keyboardType: TextInputType.emailAddress,
                                   decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.lock),
-                                      labelText: 'Enter password',
+                                      labelText: 'Please enter your password',
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(40)))),
@@ -258,15 +262,18 @@ class _RegisterAluminiState extends State<RegisterAlumini> {
                                     _password = value!;
                                   },
                                   validator: (val) {
-                                    if (val!.isEmpty) return 'empty';
-                                    if (val != _pass.text) return 'not match';
+                                    if (val!.isEmpty)
+                                      return 'please enter your password';
+                                    if (val != _pass.text)
+                                      return 'password does not match';
                                     return null;
                                   },
                                   keyboardType: TextInputType.emailAddress,
                                   obscureText: true,
                                   decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.lock),
-                                      labelText: 'confirm your password',
+                                      labelText:
+                                          'Please enter your confirm password',
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(40)))),
@@ -279,10 +286,16 @@ class _RegisterAluminiState extends State<RegisterAlumini> {
                                   onSaved: (value) {
                                     _phoneNo = value!;
                                   },
+                                  validator: (val) {
+                                    if (val!.isEmpty && val.length < 9)
+                                      return 'please enter valid number';
+                                    return null;
+                                  },
                                   keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.phone),
-                                      labelText: 'enter your phone number',
+                                      prefixText: '+91',
+                                      labelText: 'Please enter your number',
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(40)))),
@@ -303,10 +316,15 @@ class _RegisterAluminiState extends State<RegisterAlumini> {
                                   onSaved: (value) {
                                     _experience = value!;
                                   },
+                                  validator: (val) {
+                                    if (val!.isEmpty)
+                                      return 'please enter your experience';
+                                    return null;
+                                  },
                                   keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.timelapse),
-                                      labelText: 'Experience',
+                                      labelText: 'Please enter your experience',
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(40)))),
@@ -319,10 +337,16 @@ class _RegisterAluminiState extends State<RegisterAlumini> {
                                   onSaved: (value) {
                                     _jobtitle = value!;
                                   },
+                                  validator: (val) {
+                                    if (val!.isEmpty)
+                                      return 'please enter your job title';
+                                    return null;
+                                  },
                                   keyboardType: TextInputType.name,
+                                  textCapitalization: TextCapitalization.words,
                                   decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.title),
-                                      labelText: 'Job_title',
+                                      labelText: 'Please enter your Job_title',
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(40)))),
@@ -335,10 +359,17 @@ class _RegisterAluminiState extends State<RegisterAlumini> {
                                   onSaved: (value) {
                                     _jobCompany = value!;
                                   },
+                                  validator: (val) {
+                                    if (val!.isEmpty)
+                                      return 'please enter your job company';
+                                    return null;
+                                  },
+                                  textCapitalization: TextCapitalization.words,
                                   keyboardType: TextInputType.name,
                                   decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.business_center),
-                                      labelText: 'Job_Company',
+                                      labelText:
+                                          'Please enter your Job_Company',
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(40)))),

@@ -28,18 +28,18 @@ class SplashState extends State<Splash> with AfterLayoutMixin<Splash> {
     } else if (_seen) {
       if (!status)
         Timer(
-            Duration(milliseconds: 2000),
+            Duration(milliseconds: 2500),
             () => Navigator.of(context).pushReplacement(
                 new MaterialPageRoute(builder: (context) => Authe())));
       else
         Timer(
-            Duration(milliseconds: 2000),
+            Duration(milliseconds: 2500),
             () => Navigator.of(context).pushReplacement(
                 new MaterialPageRoute(builder: (context) => HomePage())));
     } else {
       await prefs.setBool('seen', true);
       Timer(
-          Duration(milliseconds: 2000),
+          Duration(milliseconds: 2500),
           () => Navigator.of(context).pushReplacement(
               new MaterialPageRoute(builder: (context) => SliderPage())));
     }
@@ -52,7 +52,7 @@ class SplashState extends State<Splash> with AfterLayoutMixin<Splash> {
   Widget build(BuildContext context) {
     return new Scaffold(
       body: new Center(
-        child: new Image.asset('assets/logo.png'),
+        child: new Image.asset('assets/splash_logo.gif'),
       ),
     );
   }

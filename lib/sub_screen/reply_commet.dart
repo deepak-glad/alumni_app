@@ -29,6 +29,7 @@ class _ReplyCommentState extends State<ReplyComment> {
     _editingController.clear();
   }
 
+  var _enteredComment = '';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -147,6 +148,11 @@ class _ReplyCommentState extends State<ReplyComment> {
                 maxLines: 7,
                 decoration:
                     InputDecoration(hintText: 'Leave your throughts here...'),
+                onChanged: (value) {
+                  setState(() {
+                    _enteredComment = value;
+                  });
+                },
               ),
             ),
             TextButton(

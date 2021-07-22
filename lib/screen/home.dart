@@ -3,14 +3,12 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:test_appp/api/feed_get_api.dart';
 import 'package:test_appp/api/like_dislike_api.dart';
 import 'package:test_appp/module/feed_get.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import '/sub_screen/comment.dart';
 import '/sub_screen/search.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
@@ -59,9 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       value = prefs.getString('id');
       data.data.forEach((element) {
-        element.likesUser.map((e) => e.alumni.id).contains(value)
-            ? _likeuser.add(element.id)
-            : null;
+        if (element.likesUser.map((e) => e.alumni.id).contains(value))
+          _likeuser.add(element.id);
       });
     });
     return apiData;
@@ -302,7 +299,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             : apiData.alumni
                                                                 .mediaUrl,
                                                         apiData.mediaUrl,
-                                                        '${apiData.alumni.firstName} ${apiData.alumni.lastName}',
+                                                        apiData
+                                                            .alumni.firstName,
+                                                        apiData.alumni.lastName,
                                                         apiData.alumni.college
                                                             .name,
                                                         apiData.discription,

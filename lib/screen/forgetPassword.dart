@@ -95,25 +95,21 @@ class _ForgetPasswordState extends State<ForgetPassword> {
       bottomNavigationBar: widget.isLoading
           ? Center(child: CircularProgressIndicator())
           : Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SafeArea(
-                maintainBottomViewPadding: true,
-                // ignore: deprecated_member_use
-                child: FlatButton(
-                    height: 40,
-                    // minWidth: MediaQuery.of(context).size.width,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(35.0)),
-                    color: Theme.of(context).primaryColor,
-                    onPressed: _onsubmit,
-                    child: Text(
-                      'Submit',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500),
-                    )),
-              ),
+              padding: const EdgeInsets.all(16.0),
+              child: FlatButton(
+                  height: 40,
+                  minWidth: MediaQuery.of(context).size.width,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(35.0)),
+                  color: Theme.of(context).primaryColor,
+                  onPressed: _onsubmit,
+                  child: Text(
+                    'Submit',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w500),
+                  )),
             ),
     );
   }

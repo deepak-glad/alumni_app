@@ -33,11 +33,13 @@ class _LoginPageState extends State<LoginPage> {
     FocusScope.of(context).unfocus();
     await Alert(
       context: context,
-      type: AlertType.warning,
+      type: AlertType.info,
       title: "Please choice who you are",
       // desc: "PLEASE ENTER FULL DETAILS.",
       buttons: [
         DialogButton(
+            color: Theme.of(context).primaryColor,
+            splashColor: Colors.amber,
             child: Text(
               "Alumni",
               style: TextStyle(color: Colors.white, fontSize: 20),
@@ -46,20 +48,20 @@ class _LoginPageState extends State<LoginPage> {
               setState(() {
                 cho = 'Alumni';
               });
-              // cho = 'Alumni';
-
               Navigator.of(context).pop();
             }),
         DialogButton(
-            child: Text(
-              "Student",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
+            splashColor: Colors.amber,
+            color: Theme.of(context).primaryColor,
+            child: Text("Student",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                )),
             onPressed: () {
               setState(() {
                 cho = 'student';
               });
-              // cho = 'student';
               Navigator.of(context).pop();
             })
       ],
@@ -234,39 +236,37 @@ class _LoginPageState extends State<LoginPage> {
                                   child: Text('Forget Password?'))
                             ],
                           ),
-                          if (widget.isLoading) CircularProgressIndicator(),
-                          if (!widget.isLoading)
-                            Container(
-                              width: size.width,
-                              height: 42,
-                              margin: const EdgeInsets.all(15),
-                              alignment: Alignment.center,
-                              child: ElevatedButton(
-                                // onPressed: () {
-                                //   setState(() {
-                                //     _future = signInMethod(
-                                //         usernameController.text,
-                                //         passwordController.text,
-                                //         context);
-                                //   });
-                                // },
-                                onPressed: _trysave,
-                                child: Text('Login'),
-                                style: ElevatedButton.styleFrom(
-                                  textStyle: TextStyle(
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.w500),
-                                  elevation: 5,
-                                  minimumSize: size / 3,
-                                  // alignment: Alignment.center,
-                                  primary: Theme.of(context).primaryColor,
-                                  onPrimary: Colors.white,
-                                  shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(20))),
-                                ),
+                          Container(
+                            width: size.width,
+                            height: 42,
+                            margin: const EdgeInsets.all(15),
+                            alignment: Alignment.center,
+                            child: ElevatedButton(
+                              // onPressed: () {
+                              //   setState(() {
+                              //     _future = signInMethod(
+                              //         usernameController.text,
+                              //         passwordController.text,
+                              //         context);
+                              //   });
+                              // },
+
+                              onPressed: _trysave,
+                              child: Text('Login'),
+                              style: ElevatedButton.styleFrom(
+                                textStyle: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.w400),
+                                elevation: 5,
+                                minimumSize: size / 3,
+                                // alignment: Alignment.center,
+                                primary: Theme.of(context).primaryColor,
+                                onPrimary: Colors.white,
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20))),
                               ),
                             ),
+                          ),
                           TextButton(
                             onPressed: () {
                               showModalBottomSheet(

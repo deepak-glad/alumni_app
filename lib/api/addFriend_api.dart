@@ -16,15 +16,15 @@ onpress(String id, BuildContext cc) async {
   print(jsonResponse);
   // print(jsonResponse['data']['targetUser']);
   if (response.statusCode == 200 && jsonResponse['status']) {
-    // var ms = 'withdraw';
-    // ScaffoldMessenger.of(cc).showSnackBar(
-    //   SnackBar(
-    //     behavior: SnackBarBehavior.floating,
-    //     duration: Duration(seconds: 5),
-    //     content: Text(ms),
-    //     backgroundColor: Theme.of(cc).errorColor,
-    //   ),
-    // );
+    var ms = jsonResponse["data"];
+    ScaffoldMessenger.of(cc).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 5),
+        content: Text(ms),
+        backgroundColor: Theme.of(cc).primaryColor,
+      ),
+    );
   } else {
     var message = jsonResponse["message"];
     ScaffoldMessenger.of(cc).showSnackBar(

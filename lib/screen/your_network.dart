@@ -1,11 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:test_appp/api/connection_api.dart';
+import 'package:test_appp/module/suggestion.dart';
+import 'package:test_appp/screen/myfriends_profile_full.dart';
+import 'package:test_appp/sub_screen/friends_list_profile.dart';
 
 import '/api/profileDataApi.dart';
 import '/module/connection.dart';
 import 'package:flutter/material.dart';
+
+import 'edit_profile.dart';
 
 class YourNetworkScreen extends StatefulWidget {
   @override
@@ -39,18 +46,28 @@ class _YourNetworkScreenState extends State<YourNetworkScreen> {
                             child: Stack(
                               // alignment: AlignmentDirectional.topStart,
                               children: [
-                                Container(
-                                  height:
-                                      MediaQuery.of(context).size.height / 4,
-                                  width: MediaQuery.of(context).size.width,
-                                  // child: Image.network(
-                                  //   snapshot.data!.data[index].mediaUrl,
-                                  //   fit: BoxFit.cover,
-                                  // ),
-                                  child: Image.asset(
-                                    'assets/profile2.jpg',
-                                    fit: BoxFit.cover,
-                                  ),
+                                Stack(
+                                  alignment: AlignmentDirectional.topEnd,
+                                  children: [
+                                    Container(
+                                      height:
+                                          MediaQuery.of(context).size.height /
+                                                  4 -
+                                              35,
+                                      width: MediaQuery.of(context).size.width,
+                                      // child: Image.network(
+                                      //   snapshot.data!.data[index].mediaUrl,
+                                      //   fit: BoxFit.cover,
+                                      // ),
+                                      child: Image.asset(
+                                        'assets/profile2.jpg',
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.camera_enhance))
+                                  ],
                                 ),
                                 Container(
                                   margin: const EdgeInsets.only(top: 180),
@@ -71,33 +88,29 @@ class _YourNetworkScreenState extends State<YourNetworkScreen> {
                                     children: [
                                       Container(
                                         child: Text(
-                                          "${snapshot.data!.data[index].firstName}"
-                                          "${snapshot.data!.data[index].lastName}",
+                                          "${snapshot.data!.data[index].firstName} ${snapshot.data!.data[index].lastName}",
                                           textAlign: TextAlign.start,
                                           style: TextStyle(
-                                              fontSize: 28,
+                                              fontSize: 25,
                                               fontWeight: FontWeight.w500),
                                         ),
                                       ),
-                                      Row(children: [
-                                        Icon(Icons.location_pin),
-                                        Flexible(
-                                            child: new Container(
-                                          padding: new EdgeInsets.only(
-                                              right: 1.0, left: 5),
-                                          child: Text(
-                                            snapshot
-                                                .data!.data[index].college.name,
-                                            overflow: TextOverflow.visible,
-                                            style: TextStyle(
-                                              fontSize: 19,
-                                            ),
+                                      new Container(
+                                        padding: new EdgeInsets.only(
+                                            right: 2.0, bottom: 2),
+                                        child: Text(
+                                          snapshot
+                                              .data!.data[index].college.name,
+                                          overflow: TextOverflow.visible,
+                                          style: TextStyle(
+                                            fontSize: 19,
                                           ),
-                                        )),
-                                      ]),
+                                        ),
+                                      ),
                                       Divider(),
                                       Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 2.0, vertical: 8),
                                         child: Text(
                                           'Description about jobs all the description that gona display herre and som other occupation and qulification about their features',
                                           overflow: TextOverflow.clip,
@@ -164,221 +177,23 @@ class _YourNetworkScreenState extends State<YourNetworkScreen> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            'Friends',
+                                            'Connections',
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold),
                                           ),
-                                          Text(
-                                            'See All',
-                                            style: TextStyle(color: Colors.red),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pushNamed(
+                                                  MyFriendsProfile.routename);
+                                            },
+                                            child: Text('See All',
+                                                style: TextStyle(
+                                                    color: Colors.red)),
                                           )
                                         ],
                                       ),
-                                      Container(
-                                        padding: const EdgeInsets.all(5),
-                                        height: 85,
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        child: ListView(
-                                          shrinkWrap: true,
-                                          scrollDirection: Axis.horizontal,
-                                          children: [
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: CircleAvatar(),
-                                                ),
-                                                Text('Name')
-                                              ],
-                                            ),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: CircleAvatar(),
-                                                ),
-                                                Text('Name')
-                                              ],
-                                            ),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: CircleAvatar(),
-                                                ),
-                                                Text('Name')
-                                              ],
-                                            ),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: CircleAvatar(),
-                                                ),
-                                                Text('Name')
-                                              ],
-                                            ),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: CircleAvatar(),
-                                                ),
-                                                Text('Name')
-                                              ],
-                                            ),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: CircleAvatar(),
-                                                ),
-                                                Text('Name')
-                                              ],
-                                            ),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: CircleAvatar(),
-                                                ),
-                                                Text('Name')
-                                              ],
-                                            ),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: CircleAvatar(),
-                                                ),
-                                                Text('Name')
-                                              ],
-                                            ),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: CircleAvatar(),
-                                                ),
-                                                Text('Name')
-                                              ],
-                                            ),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: CircleAvatar(),
-                                                ),
-                                                Text('Name')
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                      FriendsListProfile(),
                                       Divider(),
-                                      // Row(
-                                      //   children: [
-                                      //     Container(
-                                      //       padding: const EdgeInsets.all(6),
-                                      //       margin: const EdgeInsets.all(8),
-                                      //       width: MediaQuery.of(context)
-                                      //                   .size
-                                      //                   .width /
-                                      //               2 -
-                                      //           60,
-                                      //       decoration: BoxDecoration(
-                                      //           color: Colors.blue,
-                                      //           shape: BoxShape.rectangle,
-                                      //           borderRadius: BorderRadius.all(
-                                      //               Radius.circular(50))),
-                                      //       child: Text(
-                                      //         'Open to',
-                                      //         textAlign: TextAlign.center,
-                                      //         style: TextStyle(
-                                      //             color: Colors.white,
-                                      //             fontSize: 22,
-                                      //             fontWeight: FontWeight.bold),
-                                      //       ),
-                                      //     ),
-                                      //     Container(
-                                      //       padding: const EdgeInsets.all(6),
-                                      //       margin: const EdgeInsets.all(8),
-                                      //       width: MediaQuery.of(context)
-                                      //                   .size
-                                      //                   .width /
-                                      //               2 -
-                                      //           25,
-                                      //       decoration: BoxDecoration(
-                                      //           color: Colors.white,
-                                      //           shape: BoxShape.rectangle,
-                                      //           boxShadow: [
-                                      //             BoxShadow(
-                                      //                 color: Colors.grey,
-                                      //                 spreadRadius: .5)
-                                      //           ],
-                                      //           borderRadius: BorderRadius.all(
-                                      //               Radius.circular(50))),
-                                      //       child: Text(
-                                      //         'Add section',
-                                      //         textAlign: TextAlign.center,
-                                      //         style: TextStyle(
-                                      //             color: Colors.grey,
-                                      //             fontSize: 22,
-                                      //             fontWeight: FontWeight.bold),
-                                      //       ),
-                                      //     ),
-                                      //     Container(
-                                      //         padding: const EdgeInsets.all(6),
-                                      //         margin: const EdgeInsets.all(8),
-                                      //         width: 25,
-                                      //         decoration: BoxDecoration(
-                                      //           color: Colors.white,
-                                      //           shape: BoxShape.circle,
-                                      //           boxShadow: [
-                                      //             BoxShadow(
-                                      //                 color: Colors.grey,
-                                      //                 spreadRadius: 1)
-                                      //           ],
-                                      //           // borderRadius: BorderRadius.all(Radius.circular(50))
-                                      //         ),
-                                      //         child: Icon(
-                                      //           Icons.more_horiz,
-                                      //           textDirection:
-                                      //               TextDirection.rtl,
-                                      //         )),
-                                      //   ],
-                                      // ),
                                       ListTile(
                                         leading: Icon(Icons.feed),
                                         title: Text('Activity'),
@@ -403,43 +218,108 @@ class _YourNetworkScreenState extends State<YourNetworkScreen> {
                                     // width: 100,
                                     alignment: Alignment.bottomLeft,
                                     margin: const EdgeInsets.only(
-                                        top: 130, left: 20, right: 20),
+                                        top: 100, left: 20, right: 2),
                                     child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          CircleAvatar(
-                                              radius: 50,
-                                              backgroundImage: AssetImage(
-                                                  'assets/profile.png')),
                                           GestureDetector(
-                                            dragStartBehavior:
-                                                DragStartBehavior.down,
-                                            onTap: () {},
-                                            child: Container(
-                                              // height: 35,
-                                              padding: const EdgeInsets.all(8),
-                                              decoration: BoxDecoration(
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                        spreadRadius: 1,
-                                                        color: Colors.black12,
-                                                        offset: Offset
-                                                            .fromDirection(
-                                                                0.9, 2.5),
-                                                        blurRadius: 2.0)
-                                                  ],
-                                                  shape: BoxShape.circle,
-                                                  color: Colors.white),
-                                              margin: const EdgeInsets.only(
-                                                  top: 60.0),
-                                              child: Icon(
-                                                Icons.add,
-                                                color: Colors.grey,
-                                                size: 30,
-                                              ),
-                                            ),
-                                          )
+                                            onTap: () {
+                                              //for profile image change
+                                            },
+                                            child: Stack(
+                                                alignment:
+                                                    Alignment.bottomRight,
+                                                children: [
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                              spreadRadius: 2.5,
+                                                              blurRadius: 1,
+                                                              color:
+                                                                  Colors.white)
+                                                        ]),
+                                                    child: CircleAvatar(
+                                                      radius: 63,
+                                                      backgroundImage: AssetImage(
+                                                          'assets/profile1.jpg'),
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    // height: 35,
+                                                    padding:
+                                                        const EdgeInsets.all(7),
+                                                    decoration: BoxDecoration(
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                              spreadRadius: 1,
+                                                              color: Colors
+                                                                  .black12,
+                                                              offset: Offset
+                                                                  .fromDirection(
+                                                                      0.9, 2.5),
+                                                              blurRadius: 2.0)
+                                                        ],
+                                                        shape: BoxShape.circle,
+                                                        color: Colors.white),
+
+                                                    child: Icon(Icons.add,
+                                                        color: Colors.black,
+                                                        size: 17),
+                                                  ),
+                                                ]),
+                                          ),
+                                          // GestureDetector(
+                                          //   dragStartBehavior:
+                                          //       DragStartBehavior.down,
+                                          //   onTap: () {
+                                          //     Navigator.of(context).push(
+                                          //         MaterialPageRoute(
+                                          //             builder: (BuildContext
+                                          //                     context) =>
+                                          //                 ProfileEdit()));
+                                          //   },
+                                          //   child: Container(
+                                          //     // height: 35,
+                                          //     padding: const EdgeInsets.all(8),
+                                          //     decoration: BoxDecoration(
+                                          //         boxShadow: [
+                                          //           BoxShadow(
+                                          //               spreadRadius: 1,
+                                          //               color: Colors.black12,
+                                          //               offset: Offset
+                                          //                   .fromDirection(
+                                          //                       0.9, 2.5),
+                                          //               blurRadius: 2.0)
+                                          //         ],
+                                          //         shape: BoxShape.circle,
+                                          //         color: Colors.white),
+                                          //     margin: const EdgeInsets.only(
+                                          //         top: 60.0),
+                                          //     child: Icon(
+                                          //       Icons.add,
+                                          //       color: Colors.grey,
+                                          //       size: 30,
+                                          //     ),
+                                          //   ),
+                                          // )
+
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 15.0),
+                                            child: IconButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).push(
+                                                      MaterialPageRoute(
+                                                          builder: (BuildContext
+                                                                  context) =>
+                                                              ProfileEdit()));
+                                                },
+                                                icon: Icon(Icons
+                                                    .mode_edit_outline_outlined)),
+                                          ),
                                         ])),
                               ],
                             ));

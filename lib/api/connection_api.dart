@@ -7,7 +7,7 @@ import '/module/suggestion.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-Future<Welcome> connectionSuggestion() async {
+Future<FriendModel> connectionSuggestion() async {
   var data;
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var value = prefs.getString('token');
@@ -18,11 +18,12 @@ Future<Welcome> connectionSuggestion() async {
   });
   final jsonBody = reponse.body;
   final jsonMap = jsonDecode(jsonBody);
-  data = Welcome.fromJson(jsonMap);
+  data = FriendModel.fromJson(jsonMap);
+  print(jsonBody);
   return data;
 }
 
-Future<Welcome> myFriendsList() async {
+Future<FriendModel> myFriendsList() async {
   var data;
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var value = prefs.getString('token');
@@ -33,7 +34,7 @@ Future<Welcome> myFriendsList() async {
   });
   final jsonBody = reponse.body;
   final jsonMap = jsonDecode(jsonBody);
-  data = Welcome.fromJson(jsonMap);
+  data = FriendModel.fromJson(jsonMap);
   print(jsonMap);
   return data;
 }
@@ -54,10 +55,10 @@ Future<Pending> mypendingREquest() async {
   return data;
 }
 
-Future<void> addFriend(String requestedID, BuildContext cc) async {
+Future<void> addFriend(String requestedID, BuildContext cc, bool acc) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var value = prefs.getString('token');
-  var data = {"requestValue": true};
+  var data = {"requestValue": acc};
   var url = Uri.parse(
       'https://alumni-supervision.herokuapp.com/connect/accept/$requestedID');
   http.Response response =
@@ -70,7 +71,7 @@ Future<void> addFriend(String requestedID, BuildContext cc) async {
   print(jsonResponse);
   // print(jsonResponse['data']['targetUser']);
   if (response.statusCode == 200 && jsonResponse['status']) {
-    var ms = 'friend requested accepted';
+    var ms = jsonResponse["data"];
     ScaffoldMessenger.of(cc).showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,

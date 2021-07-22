@@ -148,20 +148,23 @@ class _OtpVerificationState extends State<OtpVerification> {
       bottomNavigationBar: widget.isLoading
           ? Center(child: CircularProgressIndicator())
           // ignore: deprecated_member_use
-          : FlatButton(
-              height: 40,
-              minWidth: MediaQuery.of(context).size.width,
-              shape: RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(30.0)),
-              color: Theme.of(context).primaryColor,
-              onPressed: _trySubmit,
-              child: Text(
-                'Submit',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500),
-              )),
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: FlatButton(
+                  height: 40,
+                  minWidth: MediaQuery.of(context).size.width,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(35.0)),
+                  color: Theme.of(context).primaryColor,
+                  onPressed: _trySubmit,
+                  child: Text(
+                    'Submit',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w500),
+                  )),
+            ),
     );
   }
 }

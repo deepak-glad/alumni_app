@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_appp/api/comment_api.dart';
 import 'package:test_appp/api/like_dislike_api.dart';
 import 'package:test_appp/module/comment_model.dart';
@@ -16,8 +17,9 @@ class CommentScreen extends StatefulWidget {
   final commentcount;
   final String profileImage;
   final List image;
-  final String name;
-  final String batchYear;
+  final String firstname;
+  final String lastname;
+  final String collegename;
   final String description;
   final List liked;
 
@@ -27,8 +29,9 @@ class CommentScreen extends StatefulWidget {
       this.commentcount,
       this.profileImage,
       this.image,
-      this.name,
-      this.batchYear,
+      this.firstname,
+      this.lastname,
+      this.collegename,
       this.description,
       this.liked);
 
@@ -43,19 +46,50 @@ class _CommentScreenState extends State<CommentScreen> {
     FocusScope.of(context).unfocus();
     print(_enteredComment);
     commentData(widget.postId, _enteredComment);
+    _commentData.add(CommentElement(
+        replies: [],
+        id: widget.postId,
+        user: Alumni(
+            college: College(id: widget.postId, name: widget.collegename),
+            email: '',
+            firstName: name,
+            id: widget.postId,
+            lastName: ''),
+        alumni: Alumni(
+            college: College(id: widget.postId, name: widget.collegename),
+            email: '',
+            firstName: name,
+            id: widget.postId,
+            lastName: ''),
+        comment: _enteredComment,
+        post: widget.postId,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        replyCount: 0));
     _editingController.clear();
   }
 
   late Future<Comment> _future;
   var _id;
+  late List<CommentElement> _commentData = <CommentElement>[];
   void initState() {
+    _profileData();
     _future = commentgetdata(widget.postId);
     _future.then((value) {
       setState(() {
         _id = value.data.id;
+        _commentData = value.data.comments;
       });
     });
     super.initState();
+  }
+
+  var name;
+  _profileData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      name = prefs.getString('name');
+    });
   }
 
   Future _onPull() async {
@@ -100,9 +134,9 @@ class _CommentScreenState extends State<CommentScreen> {
                                 backgroundImage:
                                     AssetImage('assets/profile.png'),
                               ),
-                        title: Text(widget.name),
+                        title: Text('${widget.firstname} ${widget.lastname}'),
                         subtitle: Text(
-                          widget.batchYear,
+                          widget.collegename,
                           overflow: TextOverflow.ellipsis,
                         ),
                         trailing: IconButton(
@@ -182,7 +216,7 @@ class _CommentScreenState extends State<CommentScreen> {
                             Text(
                                 ' ${widget.liked.contains(_id) ? widget.likecount + 1 : widget.likecount} like'),
                             Text(
-                                '${widget.commentcount < 1 ? '0' : widget.commentcount} comment')
+                                '${_commentData.isEmpty ? widget.commentcount : _commentData.length} comment')
                           ],
                         ),
                       ),
@@ -231,6 +265,51 @@ class _CommentScreenState extends State<CommentScreen> {
                     ],
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0, top: 10, bottom: 5),
+                  child: Text(
+                    'Reactions',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 9),
+                  height: 40,
+                  child: ListView(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      Stack(
+                          alignment: AlignmentDirectional.bottomEnd,
+                          children: [
+                            CircleAvatar(),
+                            Icon(
+                              Icons.thumb_up,
+                              color: Theme.of(context).primaryColor,
+                              size: 17,
+                            )
+                          ]),
+                      SizedBox(width: 5),
+                      Stack(
+                          alignment: AlignmentDirectional.bottomEnd,
+                          children: [
+                            CircleAvatar(),
+                            Icon(
+                              Icons.thumb_up,
+                              color: Theme.of(context).primaryColor,
+                              size: 17,
+                            )
+                          ]),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0, top: 10, bottom: 5),
+                  child: Text(
+                    'Comments',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  ),
+                ),
                 FutureBuilder<Comment>(
                     future: _future,
                     builder: (context, snapshot) {
@@ -239,163 +318,71 @@ class _CommentScreenState extends State<CommentScreen> {
                           return ListView.builder(
                               physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: snapshot.data!.data.comments.length,
+                              itemCount: _commentData.length,
                               itemBuilder: (context, index) {
-                                var dta = snapshot.data!.data;
+                                var dta = _commentData[index];
 
                                 return Container(
                                     width: MediaQuery.of(context).size.width,
-                                    child: Column(
+                                    child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 8.0, top: 10, bottom: 5),
-                                            child: Text(
-                                              'Reactions',
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w500),
-                                            ),
-                                          ),
                                           Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 9),
-                                            height: 40,
-                                            child: ListView(
-                                              shrinkWrap: true,
-                                              scrollDirection: Axis.horizontal,
-                                              children: [
-                                                Stack(
-                                                    alignment:
-                                                        AlignmentDirectional
-                                                            .bottomEnd,
-                                                    children: [
-                                                      CircleAvatar(),
-                                                      Icon(
-                                                        Icons.thumb_up,
-                                                        color: Theme.of(context)
-                                                            .primaryColor,
-                                                        size: 17,
-                                                      )
-                                                    ]),
-                                                SizedBox(width: 5),
-                                                Stack(
-                                                    alignment:
-                                                        AlignmentDirectional
-                                                            .bottomEnd,
-                                                    children: [
-                                                      CircleAvatar(),
-                                                      Icon(
-                                                        Icons.thumb_up,
-                                                        color: Theme.of(context)
-                                                            .primaryColor,
-                                                        size: 17,
-                                                      )
-                                                    ]),
-                                              ],
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 8.0, top: 10, bottom: 5),
-                                            child: Text(
-                                              'Comments',
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w500),
-                                            ),
-                                          ),
-                                          Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
+                                              margin: const EdgeInsets.only(
+                                                  top: 10),
+                                              width: 60,
+                                              child: CircleAvatar()),
+                                          Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                Container(
-                                                    margin:
-                                                        const EdgeInsets.only(
-                                                            top: 10),
-                                                    width: 60,
-                                                    child: CircleAvatar()),
-                                                Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      CommentStructure(
-                                                          dta.comments[index]
-                                                              .alumni.firstName,
-                                                          dta.comments[index]
-                                                              .alumni.lastName,
-                                                          snapshot
-                                                              .data!
-                                                              .data
-                                                              .comments[index]
-                                                              .alumni
-                                                              .college
-                                                              .name,
-                                                          dta.comments[index]
-                                                              .comment),
-                                                      TextButton(
-                                                          onPressed: () {
-                                                            Navigator.of(context).push(MaterialPageRoute(
-                                                                builder: (BuildContext context) => ReplyComment(
-                                                                    dta
-                                                                        .comments[
-                                                                            index]
-                                                                        .id,
-                                                                    dta
-                                                                        .comments[
-                                                                            index]
-                                                                        .alumni
-                                                                        .firstName,
-                                                                    dta
-                                                                        .comments[
-                                                                            index]
-                                                                        .alumni
-                                                                        .lastName,
-                                                                    snapshot
-                                                                        .data!
-                                                                        .data
-                                                                        .comments[
-                                                                            index]
-                                                                        .alumni
-                                                                        .college
-                                                                        .name,
-                                                                    dta
-                                                                        .comments[
-                                                                            index]
-                                                                        .comment,
-                                                                    widget
-                                                                        .profileImage)));
-                                                          },
-                                                          child: Text('Reply')),
-                                                      if (dta.comments[index]
-                                                          .replies.isNotEmpty)
-                                                        Column(
-                                                            children: dta
-                                                                .comments[index]
-                                                                .replies
-                                                                .map<Widget>((e) => REplyComment(
-                                                                    e.alumni
-                                                                        .firstName,
-                                                                    e.alumni
-                                                                        .lastName,
-                                                                    e
-                                                                        .alumni
-                                                                        .college
-                                                                        .name,
-                                                                    e.reply))
-                                                                .toList()),
-                                                      Divider(
-                                                          height: 10,
-                                                          color: Colors.black,
-                                                          thickness: 5),
-                                                    ]),
+                                                CommentStructure(
+                                                    dta.alumni.firstName,
+                                                    dta.alumni.lastName,
+                                                    dta.alumni.college.name,
+                                                    dta.comment),
+                                                TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).push(MaterialPageRoute(
+                                                          builder: (BuildContext
+                                                                  context) =>
+                                                              ReplyComment(
+                                                                  dta.id,
+                                                                  dta.alumni
+                                                                      .firstName,
+                                                                  dta.alumni
+                                                                      .lastName,
+                                                                  dta
+                                                                      .alumni
+                                                                      .college
+                                                                      .name,
+                                                                  dta.comment,
+                                                                  widget
+                                                                      .profileImage)));
+                                                    },
+                                                    child: Text('Reply')),
+                                                if (dta.replies.isNotEmpty)
+                                                  Column(
+                                                      children: dta.replies
+                                                          .map<Widget>((e) =>
+                                                              REplyComment(
+                                                                  e.alumni
+                                                                      .firstName,
+                                                                  e.alumni
+                                                                      .lastName,
+                                                                  e
+                                                                      .alumni
+                                                                      .college
+                                                                      .name,
+                                                                  e.reply))
+                                                          .toList()),
+                                                Divider(
+                                                    height: 10,
+                                                    color: Colors.black,
+                                                    thickness: 5),
                                               ]),
                                         ]));
                               });

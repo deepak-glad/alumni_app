@@ -2,7 +2,6 @@
 //
 //     final pending = pendingFromJson(jsonString);
 
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 Pending pendingFromJson(String str) => Pending.fromJson(json.decode(str));
@@ -47,29 +46,26 @@ class Invita {
     required this.blocked,
     required this.createdAt,
     required this.updatedAt,
-    required this.v,
   });
 
   Target target;
   String id;
-  String user;
+  Target user;
   String targetUser;
   bool connect;
   bool blocked;
   DateTime createdAt;
   DateTime updatedAt;
-  int v;
 
   factory Invita.fromJson(Map<String, dynamic> json) => Invita(
         target: Target.fromJson(json["target"]),
         id: json["_id"],
-        user: json["user"],
+        user: Target.fromJson(json["users"]),
         targetUser: json["targetUser"],
         connect: json["connect"],
         blocked: json["blocked"],
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
-        v: json["__v"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -81,7 +77,6 @@ class Invita {
         "blocked": blocked,
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
-        "__v": v,
       };
 }
 

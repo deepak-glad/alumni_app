@@ -108,8 +108,9 @@ class _EventAddState extends State<EventAdd> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
+          // color: Colors.amber,
           height: MediaQuery.of(context).size.height,
-          padding: const EdgeInsets.all(5),
+          // padding: const EdgeInsets.all(5),
           margin: const EdgeInsets.all(10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,23 +121,41 @@ class _EventAddState extends State<EventAdd> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
-                      icon:
-                          Icon(Icons.close, size: 39, color: Colors.grey[500]),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: CircleBorder(),
+                        elevation: 2,
+                        alignment: Alignment.center,
+                        primary: Colors.red[100],
+                        onPrimary: Colors.white,
+                      ),
+                      child: Icon(
+                        Icons.logout_sharp,
+                        color: Colors.red,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
                     ),
                     widget.isLoading
                         ? CircularProgressIndicator()
-                        : IconButton(
+                        : ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              shape: CircleBorder(),
+                              elevation: 2,
+                              alignment: Alignment.center,
+                              primary: Colors.green[100],
+                              onPrimary: Colors.white,
+                            ),
+                            child: Icon(
+                              Icons.check,
+                              color: eventName.text.isNotEmpty
+                                  ? Colors.green
+                                  : Colors.grey,
+                            ),
                             onPressed:
                                 eventName.text.isNotEmpty ? _onsubmit : null,
-                            icon: Icon(Icons.done,
-                                size: 39,
-                                color: eventName.text.isNotEmpty
-                                    ? Colors.blue
-                                    : Colors.grey[500]))
+                          )
                   ],
                 ),
               ),
@@ -147,9 +166,20 @@ class _EventAddState extends State<EventAdd> {
               Form(
                 key: _formKey,
                 child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8.0),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black54,
+                          blurRadius: 2.0,
+                          spreadRadius: 0.0,
+                          // offset:
+                        ),
+                      ]),
                   height: MediaQuery.of(context).size.height * 2 / 3 + 50,
                   padding: const EdgeInsets.all(10),
-                  margin: const EdgeInsets.all(5),
+                  margin: const EdgeInsets.all(10),
                   child: ListView(
                     shrinkWrap: true,
                     children: [
@@ -208,20 +238,17 @@ class _EventAddState extends State<EventAdd> {
                       ),
                       SizedBox(height: 20),
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(15),
                         height: 60,
                         decoration: BoxDecoration(
-                            //  borderRadius: BorderRadius.circular(8.0),
-                            color: Colors.white,
+                            color: Colors.teal[50],
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black,
                                 blurRadius: .5,
                                 spreadRadius: 0.0,
-                                // offset:
                               ),
                             ],
-                            // boxShadow: [BoxShadow(blurRadius: 2.0)],
                             borderRadius:
                                 BorderRadius.all(Radius.circular(20))),
                         child: GestureDetector(

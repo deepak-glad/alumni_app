@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test_appp/api/connection_api.dart';
+import 'package:test_appp/sub_screen/search.dart';
 import '/module/suggestion.dart';
 
 class FriendsList extends StatefulWidget {
@@ -10,19 +11,19 @@ class FriendsList extends StatefulWidget {
 }
 
 class _FriendsListState extends State<FriendsList>
-    with AutomaticKeepAliveClientMixin<FriendsList> {
-  late Future<Welcome> _data;
-  bool isLoading = false;
-  var add = '';
+// with AutomaticKeepAliveClientMixin<FriendsList> {
+
+{
+  late Future<FriendModel> _data;
   @override
   void initState() {
     _data = myFriendsList();
     super.initState();
   }
 
-  @override
-  bool get wantKeepAlive => true;
-  final GlobalKey _menuKey = new GlobalKey();
+  // @override
+  // bool get wantKeepAlive => true;
+  // final GlobalKey _menuKey = new GlobalKey();
   Future _onPull() async {
     await Future.delayed(Duration(milliseconds: 1000));
     setState(() {
@@ -33,26 +34,25 @@ class _FriendsListState extends State<FriendsList>
   @override
   Widget build(BuildContext context) {
     final button = new PopupMenuButton(
-        key: _menuKey,
-        itemBuilder: (_) => <PopupMenuItem<String>>[
-              new PopupMenuItem<String>(
-                  child: const Text('Unfriend'), value: 'Unfriend'),
-              new PopupMenuItem<String>(
-                  child: const Text('Block'), value: 'Block'),
-              new PopupMenuItem<String>(
-                  child: const Text('Report'), value: 'Report'),
+        itemBuilder: (_) => <PopupMenuItem>[
+              new PopupMenuItem(
+                  child: GestureDetector(
+                      onTap: () {}, child: const Text('Unfriend')),
+                  value: 'Unfriend'),
+              new PopupMenuItem(child: const Text('Block'), value: 'Block'),
+              new PopupMenuItem(child: const Text('Report'), value: 'Report'),
             ],
         onSelected: (_) {
-          dynamic state = _menuKey.currentState;
-          state.showButtonMenu();
+          // dynamic state = _menuKey.currentState;
+          // showButtonMenu();
         });
 
-    super.build(context);
+    // super.build(context);
     return Container(
       // color: Colors.amber,
       // padding: const EdgeInsets.all(5),
       margin: const EdgeInsets.only(top: 15, left: 2, right: 4),
-      child: FutureBuilder<Welcome>(
+      child: FutureBuilder<FriendModel>(
           future: _data,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
@@ -60,6 +60,7 @@ class _FriendsListState extends State<FriendsList>
                 return RefreshIndicator(
                   onRefresh: _onPull,
                   child: ListView.builder(
+                      shrinkWrap: true,
                       itemCount: snapshot.data!.data.length,
                       itemBuilder: (context, index) {
                         var _apidata = snapshot.data!.data[index];
@@ -70,7 +71,7 @@ class _FriendsListState extends State<FriendsList>
                                 leading: CircleAvatar(
                                   backgroundImage:
                                       AssetImage('assets/profile1.jpg'),
-                                  radius: 26,
+                                  radius: 30,
                                 ),
                                 title: Text(
                                     '${_apidata.firstName} ${_apidata.lastName}'),
@@ -99,9 +100,7 @@ class _FriendsListState extends State<FriendsList>
                 return Center(child: Image.asset('assets/nothing.png'));
               }
             } else if (snapshot.hasError) {
-              return Center(
-                child: Text(snapshot.hasError.toString()),
-              );
+              return Center(child: Image.asset('assets/nothing.png'));
             }
             return Center(
               child: CircularProgressIndicator(),

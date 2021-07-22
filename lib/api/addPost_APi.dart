@@ -87,8 +87,7 @@ class _SharePostState extends State<SharePost> {
           isLaoding = false;
         });
       } else {
-        var message =
-            user.message != null ? user.message : 'somthing went wrong';
+        var message = user.message;
         ScaffoldMessenger.of(cc).showSnackBar(
           SnackBar(
             behavior: SnackBarBehavior.floating,
@@ -120,7 +119,6 @@ class _SharePostState extends State<SharePost> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           elevation: 2,
           behavior: SnackBarBehavior.floating,
-          dismissDirection: DismissDirection.horizontal,
           duration: Duration(seconds: 3),
           content: Text(defaultmessage),
           backgroundColor: Colors.blueGrey[300],

@@ -66,9 +66,32 @@ class _AutheState extends State<Authe> {
     }
   }
 
+  buildShowDialog(BuildContext context) {
+    // if (widget.isLoading) {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return WillPopScope(
+              onWillPop: () async => false,
+              child: AlertDialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8.0))),
+                  backgroundColor: Colors.white,
+                  content: SizedBox(
+                    height: 100,
+                    width: 50,
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )));
+        });
+  }
+
   bool isLoading = false;
   Future signInMethod(String email, String pass, bool rem, String choice,
       BuildContext cc) async {
+    buildShowDialog(cc);
     print(choice);
     setState(() {
       isLoading = true;
@@ -103,6 +126,7 @@ class _AutheState extends State<Authe> {
       });
       var jsonResponse = json.decode(response.body);
       // print(jsonResponse);
+      // var profiledata=
       if (response.statusCode == 200 && jsonResponse['status']) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setBool("isLoggedIn", rem);
@@ -120,13 +144,17 @@ class _AutheState extends State<Authe> {
         final key3 = 'id';
         final value3 = '${jsonResponse['data']['_id']}';
         prefs.setString(key3, value3);
+        // final key4 = 'college';
+        // final value4 = '${jsonResponse['data']['college']['name']}';
+        // prefs.setString(key4, value4);
         return Navigator.of(cc).pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (BuildContext context) => HomePage(),
             ),
             (Route<dynamic> route) => false);
       } else if (jsonResponse['status'] == false) {
-        var d = jsonResponse['msg'];
+        Navigator.of(cc).pop();
+        var d = jsonResponse['message'];
         ScaffoldMessenger.of(cc).showSnackBar(SnackBar(
           duration: Duration(seconds: 5),
           content: Text(d),

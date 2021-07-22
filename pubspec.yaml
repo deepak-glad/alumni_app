@@ -42,12 +42,17 @@ dependencies:
   dio: ^4.0.0
   carousel_slider: ^4.0.0
   flutter_image_compress: ^1.0.0
-  cached_network_image: ^3.0.0
+  cached_network_image: ^3.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: '^0.9.0'
 
+flutter_icons:
+  image_path: 'assets/logo.png'
+  android: true
+  ios: true
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -69,11 +74,12 @@ flutter:
     - assets/profile2.jpg
     - assets/background_login.jpg
     - assets/menu.png
-    - assets/logo.png
     - assets/success.gif
     - assets/events.jpg
     - assets/nothing.png
     - assets/icon.png
+    - assets/splash.png
+    - assets/splash_logo.gif
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see

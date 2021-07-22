@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:test_appp/sub_screen/friends_list.dart';
 import 'package:test_appp/sub_screen/pending_list.dart';
-
-import '/screen/requestFriendList.dart';
 import '/sub_screen/connection_suggestion.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +11,7 @@ class ConnectionScreen extends StatefulWidget {
 
 class _ConnectionScreenState extends State<ConnectionScreen>
     with SingleTickerProviderStateMixin {
-  final _Pages = <Widget>[
+  final _pages = <Widget>[
     ConnectionSuggestion(),
     FriendsList(),
     PendingFriendsList()
@@ -62,7 +60,7 @@ class _ConnectionScreenState extends State<ConnectionScreen>
               ),
             ),
             Expanded(
-              child: TabBarView(controller: _tabController, children: _Pages),
+              child: TabBarView(controller: _tabController, children: _pages),
             ),
           ],
         ),

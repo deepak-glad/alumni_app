@@ -26,61 +26,34 @@ class _CategorySelectorState extends State<CategorySelector> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 250,
-      padding: const EdgeInsets.all(8),
-      margin: const EdgeInsets.all(15),
-      child: Column(
-        // crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'choose who you are ?',
-            style: TextStyle(
-                fontSize: 25, fontWeight: FontWeight.bold, color: Colors.red),
-          ),
-          Container(
-            padding: const EdgeInsets.all(10.0),
-            height: 150,
-            alignment: Alignment.center,
-            width: MediaQuery.of(context).size.width,
-            child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                shrinkWrap: true,
-                itemCount: category.length,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    splashColor: Colors.pinkAccent,
-                    onTap: () {
-                      setState(() {
-                        category
-                            .forEach((category) => category.isSelected = false);
-                        category[index].isSelected = true;
-                        gd = category[index].name;
-                      });
-                      widget.gdd(gd);
-                    },
-                    child: CustomRadio(category[index]),
-                  );
-                }),
-          ),
-          Container(
-              alignment: Alignment.topRight,
-              child: ElevatedButton(
-                  onPressed: gd == 'Alumini'
-                      ? () {
-                          Navigator.of(context).pop();
-                          Navigator.of(context)
-                              .pushNamed(RegistrationAlumini.routeName);
-                        }
-                      : gd == 'Student'
-                          ? () {
-                              Navigator.of(context).pop();
-                              Navigator.of(context)
-                                  .pushNamed(RegistrationStudent.routeName);
-                            }
-                          : null,
-                  child: Text('Next')))
-        ],
-      ),
+      padding: const EdgeInsets.all(10.0),
+      height: 100,
+      alignment: Alignment.center,
+      width: MediaQuery.of(context).size.width,
+      child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          shrinkWrap: true,
+          itemCount: category.length,
+          itemBuilder: (context, index) {
+            return InkWell(
+              splashColor: Colors.pinkAccent,
+              onTap: () {
+                setState(() {
+                  category.forEach((category) => category.isSelected = false);
+                  category[index].isSelected = true;
+                  gd = category[index].name;
+                });
+                widget.gdd(gd);
+                Navigator.of(context).pop();
+                gd == 'Alumini'
+                    ? Navigator.of(context)
+                        .pushNamed(RegistrationAlumini.routeName)
+                    : Navigator.of(context)
+                        .pushNamed(RegistrationStudent.routeName);
+              },
+              child: CustomRadio(category[index]),
+            );
+          }),
     );
   }
 }
