@@ -6,6 +6,8 @@ import '/screen/register_student.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
+import 'mail_verification_api.dart';
+
 class RegistrationStudent extends StatefulWidget {
   static const routeName = 'register-Student';
   @override
@@ -13,9 +15,32 @@ class RegistrationStudent extends StatefulWidget {
 }
 
 class _RegistrationStudentState extends State<RegistrationStudent> {
+  buildShowDialog(BuildContext context) {
+    // if (widget.isLoading) {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return WillPopScope(
+              onWillPop: () async => false,
+              child: AlertDialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8.0))),
+                  backgroundColor: Colors.white,
+                  content: SizedBox(
+                    height: 100,
+                    width: 50,
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )));
+        });
+  }
+
   bool isLoading = false;
   registerMethod(String name, String lastname, String rollno, String cgID,
       String email, String password, String phoneNo, BuildContext cc) async {
+    buildShowDialog(cc);
     try {
       setState(() {
         isLoading = true;
@@ -38,22 +63,45 @@ class _RegistrationStudentState extends State<RegistrationStudent> {
             "Content-Type": "application/json"
           });
       var da = json.decode(response.body);
-      print(response.body);
       Map<String, dynamic> userMap = jsonDecode(response.body);
+      print(response.body);
       if (response.statusCode == 200 && da['status'] == true) {
         return Navigator.of(cc).pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (BuildContext context) =>
-                  VerifyApi(name: email, choice: 'user'),
+                  VerifyApi(email: email, choice: 'user'),
             ),
             (Route<dynamic> route) => false);
+      } else if (da['message'] == 'Verify Your Account Credentials') {
+        Navigator.of(cc).pop();
+        var res = 'Verify Your Account Credentials';
+        ScaffoldMessenger.of(cc).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 5),
+            content: Text(res),
+            backgroundColor: Theme.of(cc).errorColor,
+            action: SnackBarAction(
+              label: 'Verify',
+              onPressed: () {
+                Navigator.of(cc).push(MaterialPageRoute(
+                  builder: (BuildContext context) => MailVerificationApi(),
+                ));
+              },
+              textColor: Colors.blue,
+            ),
+          ),
+        );
+        setState(() {
+          isLoading = false;
+        });
       } else {
+        Navigator.of(cc).pop();
         var user = Welcome.fromJson(userMap);
         var res = user.errors[0].msg;
         ScaffoldMessenger.of(cc).showSnackBar(
           SnackBar(
             duration: Duration(seconds: 5),
-            content: Text(res),
+            content: Text(res.toString()),
             backgroundColor: Theme.of(cc).errorColor,
           ),
         );
@@ -62,6 +110,7 @@ class _RegistrationStudentState extends State<RegistrationStudent> {
         });
       }
     } catch (err) {
+      Navigator.of(cc).pop();
       var message = 'cannot registered';
       ScaffoldMessenger.of(cc).showSnackBar(
         SnackBar(

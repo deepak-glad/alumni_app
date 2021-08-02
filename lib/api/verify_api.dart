@@ -5,9 +5,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class VerifyApi extends StatefulWidget {
-  final String name;
+  final String email;
   final String choice;
-  const VerifyApi({required this.name, required this.choice});
+  const VerifyApi({required this.email, required this.choice});
 
   @override
   _VerifyApiState createState() => _VerifyApiState();
@@ -16,13 +16,13 @@ class VerifyApi extends StatefulWidget {
 class _VerifyApiState extends State<VerifyApi> {
   var isLoading = false;
 
-  _onsubmit(var otpPin) async {
+  _onsubmit(String otpPin) async {
     setState(() {
       isLoading = true;
     });
-    var data = {"tokenValue": otpPin, "email": widget.name};
+    var data = {"tokenValue": otpPin, "email": widget.email};
     var url = Uri.parse(widget.choice == 'Alumini'
-        ? 'https://alumni-supervision.herokuapp.com//alumni/verify'
+        ? 'https://alumni-supervision.herokuapp.com/alumni/verify'
         : 'https://alumni-supervision.herokuapp.com/user/verify');
     http.Response response = await http.post(url,
         body: jsonEncode(data),
@@ -39,26 +39,6 @@ class _VerifyApiState extends State<VerifyApi> {
           builder: (BuildContext context) => SuccessfullyRegistered(),
         ),
       );
-      // Alert(
-      //   context: context,
-      //   type: AlertType.warning,
-      //   title: "Success",
-      //   desc: "CONGRATULATION! YOU HAVE SUCCEESSFULLY CHANGE YOUR PASSWORD",
-      //   buttons: [
-      //     DialogButton(
-      //         child: Text(
-      //           "LOGIN",
-      //           style: TextStyle(color: Colors.white, fontSize: 20),
-      //         ),
-      //         onPressed: () {
-      //           Navigator.of(context).pushReplacement(
-      //             MaterialPageRoute<void>(
-      //               builder: (BuildContext context) => Authe(),
-      //             ),
-      //           );
-      //         }),
-      //   ],
-      // ).show();
       setState(() {
         isLoading = false;
       });
@@ -82,7 +62,7 @@ class _VerifyApiState extends State<VerifyApi> {
   Widget build(BuildContext context) {
     return VerifiRegister(
       choice: widget.choice,
-      name: widget.name,
+      name: widget.email,
       isLoading: isLoading,
       data: _onsubmit,
     );

@@ -1,17 +1,14 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:io';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:test_appp/api/connection_api.dart';
-import 'package:test_appp/module/suggestion.dart';
 import 'package:test_appp/screen/myfriends_profile_full.dart';
 import 'package:test_appp/sub_screen/friends_list_profile.dart';
-
+import 'package:test_appp/widgets/pickImage_page.dart';
 import '/api/profileDataApi.dart';
 import '/module/connection.dart';
 import 'package:flutter/material.dart';
-
 import 'edit_profile.dart';
 
 class YourNetworkScreen extends StatefulWidget {
@@ -28,6 +25,20 @@ class _YourNetworkScreenState extends State<YourNetworkScreen> {
     super.initState();
   }
 
+  var _profileImage;
+  _profilePhoto(File pickImaged) {
+    setState(() {
+      _profileImage = pickImaged;
+    });
+  }
+
+  var _coverImage;
+  _coverPhoto(File pickedImage) {
+    setState(() {
+      _coverImage = pickedImage;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,6 +52,8 @@ class _YourNetworkScreenState extends State<YourNetworkScreen> {
                       shrinkWrap: true,
                       itemCount: snapshot.data!.data.length,
                       itemBuilder: (context, index) {
+                        var apiData = snapshot.data!.data[index];
+
                         return Container(
                             color: Colors.white,
                             child: Stack(
@@ -59,13 +72,23 @@ class _YourNetworkScreenState extends State<YourNetworkScreen> {
                                       //   snapshot.data!.data[index].mediaUrl,
                                       //   fit: BoxFit.cover,
                                       // ),
-                                      child: Image.asset(
-                                        'assets/profile2.jpg',
-                                        fit: BoxFit.cover,
-                                      ),
+                                      child: _coverImage != null
+                                          ? Image.file(
+                                              _coverImage,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.asset(
+                                              'assets/profile2.jpg',
+                                              fit: BoxFit.cover,
+                                            ),
                                     ),
                                     IconButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          showModalBottomSheet(
+                                              context: context,
+                                              builder: (cxt) =>
+                                                  PickImagePage(_coverPhoto));
+                                        },
                                         icon: Icon(Icons.camera_enhance))
                                   ],
                                 ),
@@ -225,8 +248,14 @@ class _YourNetworkScreenState extends State<YourNetworkScreen> {
                                         children: [
                                           GestureDetector(
                                             onTap: () {
-                                              //for profile image change
+                                              showModalBottomSheet(
+                                                  context: context,
+                                                  builder: (cxt) =>
+                                                      PickImagePage(
+                                                          _profilePhoto));
                                             },
+                                            //for profile image change
+
                                             child: Stack(
                                                 alignment:
                                                     Alignment.bottomRight,
@@ -241,11 +270,19 @@ class _YourNetworkScreenState extends State<YourNetworkScreen> {
                                                               color:
                                                                   Colors.white)
                                                         ]),
-                                                    child: CircleAvatar(
-                                                      radius: 63,
-                                                      backgroundImage: AssetImage(
-                                                          'assets/profile1.jpg'),
-                                                    ),
+                                                    child: _profileImage != null
+                                                        ? CircleAvatar(
+                                                            radius: 63,
+                                                            backgroundImage:
+                                                                FileImage(
+                                                                    _profileImage),
+                                                          )
+                                                        : CircleAvatar(
+                                                            radius: 63,
+                                                            backgroundImage:
+                                                                AssetImage(
+                                                                    'assets/profile1.jpg'),
+                                                          ),
                                                   ),
                                                   Container(
                                                     // height: 35,
@@ -305,17 +342,26 @@ class _YourNetworkScreenState extends State<YourNetworkScreen> {
                                           //     ),
                                           //   ),
                                           // )
-
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                top: 15.0),
+                                                top: 35.0),
                                             child: IconButton(
                                                 onPressed: () {
                                                   Navigator.of(context).push(
                                                       MaterialPageRoute(
                                                           builder: (BuildContext
                                                                   context) =>
-                                                              ProfileEdit()));
+                                                              ProfileEdit(
+                                                                  apiData
+                                                                      .firstName,
+                                                                  apiData
+                                                                      .lastName,
+                                                                  apiData
+                                                                      .college,
+                                                                  apiData
+                                                                      .status,
+                                                                  apiData
+                                                                      .phoneNo)));
                                                 },
                                                 icon: Icon(Icons
                                                     .mode_edit_outline_outlined)),

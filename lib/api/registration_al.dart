@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import '/screen/register_alumini.dart';
 import 'package:flutter/material.dart';
 
+import 'mail_verification_api.dart';
+
 class RegistrationAlumini extends StatefulWidget {
   static const routeName = 'register-Alumnini';
   @override
@@ -13,6 +15,27 @@ class RegistrationAlumini extends StatefulWidget {
 }
 
 class _RegistrationAluminiState extends State<RegistrationAlumini> {
+  buildShowDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return WillPopScope(
+              onWillPop: () async => false,
+              child: AlertDialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8.0))),
+                  backgroundColor: Colors.white,
+                  content: SizedBox(
+                    height: 100,
+                    width: 50,
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )));
+        });
+  }
+
   bool isLoading = false;
   registerMethod(
       String name,
@@ -28,6 +51,7 @@ class _RegistrationAluminiState extends State<RegistrationAlumini> {
       String jobCompany,
       String ex,
       BuildContext cc) async {
+    buildShowDialog(cc);
     try {
       setState(() {
         isLoading = true;
@@ -67,10 +91,33 @@ class _RegistrationAluminiState extends State<RegistrationAlumini> {
         return Navigator.of(cc).pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (BuildContext context) =>
-                  VerifyApi(choice: 'alumni', name: email),
+                  VerifyApi(choice: 'alumni', email: email),
             ),
             (Route<dynamic> route) => false);
+      } else if (da['message'] == 'Verify Your Account Credentials') {
+        Navigator.of(cc).pop();
+        var res = 'Verify Your Account Credentials';
+        ScaffoldMessenger.of(cc).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 5),
+            content: Text(res),
+            backgroundColor: Theme.of(cc).errorColor,
+            action: SnackBarAction(
+              label: 'Verify',
+              onPressed: () {
+                Navigator.of(cc).push(MaterialPageRoute(
+                  builder: (BuildContext context) => MailVerificationApi(),
+                ));
+              },
+              textColor: Colors.blue,
+            ),
+          ),
+        );
+        setState(() {
+          isLoading = false;
+        });
       } else {
+        Navigator.of(cc).pop();
         var user = Welcome.fromJson(userMap);
         var res = user.errors[0].msg;
         ScaffoldMessenger.of(cc).showSnackBar(
@@ -85,6 +132,7 @@ class _RegistrationAluminiState extends State<RegistrationAlumini> {
         });
       }
     } catch (err) {
+      Navigator.of(cc).pop();
       // print(err);
       var message = 'cannot registered';
       ScaffoldMessenger.of(cc).showSnackBar(

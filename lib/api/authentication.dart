@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '/widgets/home_widgets.dart';
+import 'mail_verification_api.dart';
 
 class Authe extends StatefulWidget {
   @override
@@ -67,7 +68,6 @@ class _AutheState extends State<Authe> {
   }
 
   buildShowDialog(BuildContext context) {
-    // if (widget.isLoading) {
     return showDialog(
         context: context,
         barrierDismissible: false,
@@ -125,7 +125,7 @@ class _AutheState extends State<Authe> {
         'Content-Type': 'application/json; charset=UTF-8',
       });
       var jsonResponse = json.decode(response.body);
-      // print(jsonResponse);
+      print(jsonResponse);
       // var profiledata=
       if (response.statusCode == 200 && jsonResponse['status']) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -152,6 +152,26 @@ class _AutheState extends State<Authe> {
               builder: (BuildContext context) => HomePage(),
             ),
             (Route<dynamic> route) => false);
+      } else if (jsonResponse['message'] == 'Verify Your Account Credentials') {
+        Navigator.of(cc).pop();
+        var message = 'Verify Your Account Credentials';
+        ScaffoldMessenger.of(cc).showSnackBar(SnackBar(
+          duration: Duration(seconds: 5),
+          content: Text(message),
+          backgroundColor: Theme.of(cc).errorColor,
+          action: SnackBarAction(
+            textColor: Colors.blue,
+            label: 'Verify',
+            onPressed: () {
+              Navigator.of(cc).push(MaterialPageRoute(
+                builder: (BuildContext context) => MailVerificationApi(),
+              ));
+            },
+          ),
+        ));
+        setState(() {
+          isLoading = false;
+        });
       } else if (jsonResponse['status'] == false) {
         Navigator.of(cc).pop();
         var d = jsonResponse['message'];
